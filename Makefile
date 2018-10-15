@@ -1,5 +1,8 @@
-SRC=*.c
+READER=reader.c
+WRITE=write.c
 all:
-	gcc -Wall $(SRC) -o run 
+	gcc -Wall $(READER) -o read 
+	gcc -Wall $(WRITE) -o write 
 clean:
-	rm run
+	rm read
+	rm write
