@@ -2,10 +2,28 @@
 #include "stateMachine.h"
 
 char state = 0;
-
+int count=1;
+int program_fd=0;
+void touch()
+{
+	printf("alarme # %d\n", count);
+  count++;
+  if(count>=4)
+  {
+    printf("Couldn't make connection. Exiting...\n");
+    llClose(program_fd);
+    exit(1);
+  }
+  char sendMessage[255]="";
+  sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cset,Aemi^Cset,FLAG);
+  llWrite(sendMessage,program_fd);
+  alarm(3);
+}
 
 void makeConnection(int fd,char type)
 {
+  program_fd=fd;
+  signal(SIGALRM, touch);
   if(type=='W')
   {
     char sendMessage[255]="";
@@ -13,9 +31,10 @@ void makeConnection(int fd,char type)
     llWrite(sendMessage,fd);
     while(state!=5){
       char *receive=malloc(255);
+      alarm(3);
       llRead(&receive,fd);
-      char flag=0,a=0,c=0,bcc=0,flag2=0;
-      sscaf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
+      unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
+      sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
       stateMachineUA(flag);
       stateMachineUA(a);
       stateMachineUA(c);
@@ -45,7 +64,6 @@ void makeConnection(int fd,char type)
 
 void stateMachineSET(unsigned int message)
 {
-printf("mesangem:%x\n",message);
 
     switch(state){
         case 0:
