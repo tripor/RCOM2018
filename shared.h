@@ -1,4 +1,8 @@
 #include "includes.h"
 #include "macros.h"
 
-void lerCabo(char ** guardar,int fd);
+void llWrite(char *send,int fd);
+void llRead(char ** guardar,int fd);
+
+int llOpen();
+void llClose(int fd);
