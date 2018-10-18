@@ -11,42 +11,41 @@ void makeConnection(int fd,char type)
     char sendMessage[255]="";
     sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cset,Aemi^Cset,FLAG);
     llWrite(sendMessage,fd);
-
+    while(state!=5){
       char *receive=malloc(255);
       llRead(&receive,fd);
-      int flag=0,a=0,c=0,bcc=0,flag2=0;
+      char flag=0,a=0,c=0,bcc=0,flag2=0;
       sprintf(sendMessage,"%x %x %x %x %x",flag,a,c,bcc,flag2);
       stateMachineUA(flag);
       stateMachineUA(a);
       stateMachineUA(c);
       stateMachineUA(bcc);
       stateMachineUA(flag2);
-
-      printf("%d",state);
+    }
 
   }
   else if(type=='R')
   {
     char sendMessage[255]="";
-
+    while(state!=5){
       char *receive=malloc(255);
       llRead(&receive,fd);
-      int flag=0,a=0,c=0,bcc=0,flag2=0;
-      sprintf(sendMessage,"%x %x %x %x %x",flag,a,c,bcc,flag2);
+      unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
+      sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
       stateMachineSET(flag);
       stateMachineSET(a);
       stateMachineSET(c);
       stateMachineSET(bcc);
       stateMachineSET(flag2);
-
+    }
     sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Cua,Arec^Cua,FLAG);
     llWrite(sendMessage,fd);
-    printf("%d",state);
   }
 }
 
-void stateMachineSET(char message)
+void stateMachineSET(unsigned int message)
 {
+printf("mesangem:%x\n",message);
 
     switch(state){
         case 0:
@@ -55,7 +54,7 @@ void stateMachineSET(char message)
         break;
 
         case 1:
-        if(message == Arec)
+        if(message == Aemi)
             state = 2;
         else if(message != FLAG)
             state = 0;
@@ -70,7 +69,7 @@ void stateMachineSET(char message)
             state = 0;
         break;
         case 3:
-        if(message == (Arec^Cset))
+        if(message == (Aemi^Cset))
             state = 4;
         else if (message == FLAG)
             state = 1;
@@ -82,6 +81,7 @@ void stateMachineSET(char message)
         state = 5;
         else state = 0;
 
+        break;
         default: state = 0;
 
     }
@@ -92,7 +92,7 @@ void stateMachineSET(char message)
 
 }
 
-void stateMachineUA(char message)
+void stateMachineUA(unsigned int message)
 {
    switch(state){
         case 0:
@@ -101,7 +101,7 @@ void stateMachineUA(char message)
         break;
 
         case 1:
-        if(message == Aemi)
+        if(message == Arec)
             state = 2;
         else if(message != FLAG)
             state = 0;
@@ -116,7 +116,7 @@ void stateMachineUA(char message)
             state = 0;
         break;
         case 3:
-        if(message == (Aemi^Cua))
+        if(message == (Arec^Cua))
             state = 4;
         else if (message == FLAG)
             state = 1;
@@ -127,7 +127,7 @@ void stateMachineUA(char message)
         if(message == FLAG)
         state = 5;
         else state = 0;
-
+        break;
         default: state = 0;
 
     }

@@ -1,6 +1,6 @@
 #include "includes.h"
 
 void makeConnection(int fd,char type);
-void stateMachineSET(char message);
-void stateMachineUA(char message);
+void stateMachineSET(unsigned int message);
+void stateMachineUA(unsigned int message);
 void resetState();
