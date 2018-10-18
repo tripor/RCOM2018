@@ -15,7 +15,7 @@ void makeConnection(int fd,char type)
       char *receive=malloc(255);
       llRead(&receive,fd);
       char flag=0,a=0,c=0,bcc=0,flag2=0;
-      sprintf(sendMessage,"%x %x %x %x %x",flag,a,c,bcc,flag2);
+      sscaf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
       stateMachineUA(flag);
       stateMachineUA(a);
       stateMachineUA(c);
