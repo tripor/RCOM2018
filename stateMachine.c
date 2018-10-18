@@ -11,7 +11,7 @@ void makeConnection(int fd,char type)
     char sendMessage[255]="";
     sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cset,Aemi^Cset,FLAG);
     llWrite(sendMessage,fd);
-    
+
       char *receive=malloc(255);
       llRead(&receive,fd);
       int flag=0,a=0,c=0,bcc=0,flag2=0;
@@ -21,12 +21,14 @@ void makeConnection(int fd,char type)
       stateMachineUA(c);
       stateMachineUA(bcc);
       stateMachineUA(flag2);
-    
+
+      printf("%d",state);
+
   }
   else if(type=='R')
   {
     char sendMessage[255]="";
-  
+
       char *receive=malloc(255);
       llRead(&receive,fd);
       int flag=0,a=0,c=0,bcc=0,flag2=0;
@@ -36,9 +38,10 @@ void makeConnection(int fd,char type)
       stateMachineSET(c);
       stateMachineSET(bcc);
       stateMachineSET(flag2);
-    
+
     sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Cua,Arec^Cua,FLAG);
     llWrite(sendMessage,fd);
+    printf("%d",state);
   }
 }
 
