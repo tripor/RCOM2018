@@ -1,5 +1,5 @@
 #include "shared.h"
-
+#include "stateMachine.h"
 
 char state = 0;
 
@@ -14,7 +14,7 @@ void makeConnection(int fd,char type)
     while (state!=5) {
       char *receive=malloc(255);
       llRead(&receive,fd);
-      int flag,a,c,bcc,flag2;
+      int flag=0,a=0,c=0,bcc=0,flag2=0;
       sprintf(sendMessage,"%x %x %x %x %x",flag,a,c,bcc,flag2);
       stateMachineUA(flag);
       stateMachineUA(a);
@@ -25,10 +25,11 @@ void makeConnection(int fd,char type)
   }
   else if(type=='R')
   {
+    char sendMessage[255]="";
     while (state!=5) {
       char *receive=malloc(255);
       llRead(&receive,fd);
-      int flag,a,c,bcc,flag2;
+      int flag=0,a=0,c=0,bcc=0,flag2=0;
       sprintf(sendMessage,"%x %x %x %x %x",flag,a,c,bcc,flag2);
       stateMachineSET(flag);
       stateMachineSET(a);
@@ -36,7 +37,6 @@ void makeConnection(int fd,char type)
       stateMachineSET(bcc);
       stateMachineSET(flag2);
     }
-    char sendMessage[255]="";
     sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Cua,Arec^Cua,FLAG);
     llWrite(sendMessage,fd);
   }
