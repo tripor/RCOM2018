@@ -7,11 +7,12 @@ struct termios *oldtio,*newtio;
 void llWrite(char *send,int fd)
 {
   int res=write(fd,send,strlen(send)+1);
-  printf("Bytes send: %d\n",res);
+  printf("Bytes send: %d Text: %s\n",res,send);
 }
 
 void llRead(char **guardar,int fd)
 {
+  STOP=FALSE;
   char ler,buf[255]="";
 	int i=0;
   while (STOP==FALSE)
