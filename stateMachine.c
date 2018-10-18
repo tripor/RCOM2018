@@ -15,7 +15,7 @@ void makeConnection(int fd,char type)
   else if(type=='R')
   {
     char *receive=malloc(255);
-    llRead(receive,fd);
+    llRead(&receive,fd);
     printf("%s",receive);
   }
 }
