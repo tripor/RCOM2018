@@ -6,7 +6,7 @@
 #define Cset 0x03
 #define Cdisc 0x11
 #define Cua 0x08
-#define crr1 0x85
+#define Crr1 0x85
 #define Crr0 0x05
 #define Crej1 0x81
 #define Crej0 0x01
