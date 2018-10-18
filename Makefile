@@ -1,5 +1,5 @@
 READER=reader.c
-WRITE=write.c
+WRITE=writer.c
 all:
 	gcc -Wall $(READER) -o read 
 	gcc -Wall $(WRITE) -o write 
