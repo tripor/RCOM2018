@@ -11,12 +11,34 @@ void makeConnection(int fd,char type)
     char sendMessage[255]="";
     sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cset,Aemi^Cset,FLAG);
     llWrite(sendMessage,fd);
+    while (state!=5) {
+      char *receive=malloc(255);
+      llRead(&receive,fd);
+      int flag,a,c,bcc,flag2;
+      sprintf(sendMessage,"%x %x %x %x %x",flag,a,c,bcc,flag2);
+      stateMachineUA(flag);
+      stateMachineUA(a);
+      stateMachineUA(c);
+      stateMachineUA(bcc);
+      stateMachineUA(flag2);
+    }
   }
   else if(type=='R')
   {
-    char *receive=malloc(255);
-    llRead(&receive,fd);
-    printf("%s",receive);
+    while (state!=5) {
+      char *receive=malloc(255);
+      llRead(&receive,fd);
+      int flag,a,c,bcc,flag2;
+      sprintf(sendMessage,"%x %x %x %x %x",flag,a,c,bcc,flag2);
+      stateMachineSET(flag);
+      stateMachineSET(a);
+      stateMachineSET(c);
+      stateMachineSET(bcc);
+      stateMachineSET(flag2);
+    }
+    char sendMessage[255]="";
+    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Cua,Arec^Cua,FLAG);
+    llWrite(sendMessage,fd);
   }
 }
 
