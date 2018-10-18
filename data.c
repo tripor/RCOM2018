@@ -135,14 +135,16 @@ void sendData(unsigned int *data2,int length2,int fd)
 }
 
 
-void readData(int fd,unsigned int *guardar)
+void readData(int fd,unsigned int *guardar2)
 {
   unsigned int value,bcc=0,i=0,confirmar=0;
   char *receive=malloc(255);
+  unsigned int guardar[100];
   while(state2!=6){
     confirmar=0;
     bcc=0;
     i=0;
+    int k=0;
     strcpy(receive,"");
     llRead(&receive,fd);
     sscanf(receive,"%x",&value);
@@ -170,22 +172,27 @@ void readData(int fd,unsigned int *guardar)
           i--;
           help++;
         }
-      for(;j<=i;j++)
+      for(;j<=i;j++,k++)
       {
         unsigned int un=unStuff(guardar[j],guardar[j+1]);
         if(j!=i)
         {
           if(un==0)
+          {
             bcc^=guardar[j];
+            guardar2[k]=guardar[j];
+          }
           else
           {
             bcc^=un;
+            guardar2[k]=un;
             j++;
           }
         }
         else
         {
           bcc^=guardar[j];
+          guardar2[k]=guardar[j];
         }
       }
       changestate2Read(guardar[0],bcc);
