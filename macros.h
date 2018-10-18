@@ -12,4 +12,8 @@
 #define Crej0 0x01
 
 
+#define FALSE 0
+#define TRUE 1
+
+
 #endif

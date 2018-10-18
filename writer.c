@@ -24,14 +24,14 @@ int main(int argc, char** argv)
     char buf[255];
     char msg[255];
     int i, sum = 0, speed = 0;
-    
-    if ( (argc < 2) || 
-  	     ((strcmp("/dev/ttyS0", argv[1])!=0) && 
+
+    if ( (argc < 2) ||
+  	     ((strcmp("/dev/ttyS0", argv[1])!=0) &&
   	      (strcmp("/dev/ttyS1", argv[1])!=0) )) {
       printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
       exit(1);
     }
-   
+
     if(gets(buf) == NULL){
       perror("Error reading message");
       exit(1);
@@ -64,8 +64,8 @@ int main(int argc, char** argv)
 
 
 
-  /* 
-    VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a 
+  /*
+    VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a
     leitura do(s) pr�ximo(s) caracter(es)
   */
 
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 
 
 
-  res = write(fd,buf,strlen(buf)+1);   
+  res = write(fd,buf,strlen(buf)+1);
   printf("%d bytes written\n", res);
 
 
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
   strcpy(msg,"");
   char ler;
   int j = 0;
-  while (STOP==FALSE) {  
+  while (STOP==FALSE) {
          /* loop for input */
       res = read(fd,&ler,1);
       msg[j] = ler;   /* returns after 5 chars have been input */
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
        STOP=TRUE;
       }
     }
- 
+
     printf("%s \n",msg);
 
     if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {

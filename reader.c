@@ -1,11 +1,10 @@
 #include "includes.h"
+#include "shared.h"
+#include "macros.h"
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
-#define FALSE 0
-#define TRUE 1
 
-volatile int STOP=FALSE;
 
 int main(int argc, char** argv)
 {
@@ -19,7 +18,7 @@ int main(int argc, char** argv)
       printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
       exit(1);
     }
-  
+
     // Open port to read
     fd = open(argv[1], O_RDWR | O_NOCTTY );
 
@@ -43,9 +42,9 @@ int main(int argc, char** argv)
 
 
 
-  /* 
-    VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a 
-    leitura do(s) próximo(s) caracter(es)
+  /*
+    VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a
+    leitura do(s) prï¿½ximo(s) caracter(es)
   */
 
     tcflush(fd, TCIOFLUSH);
@@ -57,19 +56,12 @@ int main(int argc, char** argv)
 
     printf("New termios structure set\n");
 
-	char ler,buf[255]="";
-	int i=0;
-    while (STOP==FALSE) 
-	{
-   		res = read(fd,&ler,1);
-		buf[i]=ler;
-		i++;
-    	if (ler=='\0') 
-			STOP=TRUE;
-    }
-	printf("%s\n",buf);
+    char *receber=malloc(255);
+  lerCabo(&receber,fd);
 
-	res = write(fd,buf,strlen(buf)+1);
+
+
+	//res = write(fd,buf,strlen(buf)+1);
 
 
 	sleep(2);
