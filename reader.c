@@ -1,6 +1,6 @@
 #include "includes.h"
 #include "shared.h"
-#include "macros.h"
+#include "stateMachine.h"
 
 int main(int argc, char** argv)
 {
@@ -12,13 +12,8 @@ int main(int argc, char** argv)
 
   int fd=llOpen(argv[1]);
 
-  char *receber=malloc(255);
-  llRead(&receber,fd);
-
-  printf("%s\n",receber);
-  
-	llWrite(receber,fd);
+  makeConnection(fd,'R');
 
   llClose(fd);
-    return 0;
+  return 0;
 }

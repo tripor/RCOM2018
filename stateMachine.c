@@ -1,11 +1,27 @@
 #include "shared.h"
 
-volatile int STOP=FALSE;
 
-uint8_t state = 0;
+char state = 0;
 
-void stateMachineSET(uint8_t message)
-{   
+
+void makeConnection(int fd,char type)
+{
+  if(type=='W')
+  {
+    char sendMessage[255]="";
+    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cset,Aemi^Cset,FLAG);
+    llWrite(sendMessage,fd);
+  }
+  else if(type=='R')
+  {
+    char *receive=malloc(255);
+    llRead(receive,fd);
+    printf("%s",receive);
+  }
+}
+
+void stateMachineSET(char message)
+{
 
     switch(state){
         case 0:
@@ -25,15 +41,15 @@ void stateMachineSET(uint8_t message)
             state = 3;
         else if (message == FLAG)
             state = 1;
-        else 
+        else
             state = 0;
         break;
         case 3:
-        if(message == Arec^Cset)
+        if(message == (Arec^Cset))
             state = 4;
         else if (message == FLAG)
             state = 1;
-        else 
+        else
             state = 0;
         break;
         case 4:
@@ -41,7 +57,7 @@ void stateMachineSET(uint8_t message)
         state = 5;
         else state = 0;
 
-        default: state = 0; 
+        default: state = 0;
 
     }
 
@@ -51,11 +67,8 @@ void stateMachineSET(uint8_t message)
 
 }
 
-void stateMachineUA(uint8_t message)
-{   
-    
-   // SET=[FLAG,A,C,BCC,FLAG]
-   // UA = [FLAG,A,C,BCC,FLAG]
+void stateMachineUA(char message)
+{
    switch(state){
         case 0:
         if(message == FLAG)
@@ -74,15 +87,15 @@ void stateMachineUA(uint8_t message)
             state = 3;
         else if (message == FLAG)
             state = 1;
-        else 
+        else
             state = 0;
         break;
         case 3:
-        if(message == Aemi^Cua)
+        if(message == (Aemi^Cua))
             state = 4;
         else if (message == FLAG)
             state = 1;
-        else 
+        else
             state = 0;
         break;
         case 4:
@@ -90,11 +103,11 @@ void stateMachineUA(uint8_t message)
         state = 5;
         else state = 0;
 
-        default: state = 0; 
+        default: state = 0;
 
     }
 
-    
+
 
 }
 

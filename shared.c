@@ -6,7 +6,6 @@ struct termios *oldtio,*newtio;
 
 void llWrite(char *send,int fd)
 {
-  printf("\nrrr: %s\n",send);
   int res=write(fd,send,strlen(send)+1);
   printf("Bytes send: %d\n",res);
 }
@@ -20,7 +19,7 @@ void llRead(char **guardar,int fd)
    	read(fd,&ler,1);
 		buf[i]=ler;
 		i++;
-    if (ler=='\0')
+    if (ler=='\0' )
 		  STOP=TRUE;
   }
   strcpy(*guardar,buf);
@@ -50,12 +49,8 @@ int llOpen(char *canal)
   /* set input mode (non-canonical, no echo,...) */
   (*newtio).c_lflag = 0;
 
-  (*newtio).c_cc[VTIME]    = 0;   /* inter-character timer unused */
-  (*newtio).c_cc[VMIN]     = 1;   /* blocking read until 1 chars received */
-  /*
-  VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a
-  leitura do(s) pr�ximo(s) caracter(es)
-  */
+  (*newtio).c_cc[VTIME]    = 30;
+  (*newtio).c_cc[VMIN]     = 1;
   tcflush(fd, TCIOFLUSH);
 
   if ( tcsetattr(fd,TCSANOW,newtio) == -1) {
