@@ -10,6 +10,7 @@
 #define Crr0 0x05
 #define Crej1 0x81
 #define Crej0 0x01
+#define START 0x00
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
