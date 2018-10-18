@@ -1,6 +1,7 @@
 #include "includes.h"
 #include "shared.h"
 #include "stateMachine.h"
+#include "data.h"
 
 int main(int argc, char** argv)
 {
@@ -13,7 +14,10 @@ int main(int argc, char** argv)
   int fd=llOpen(argv[1]);
 
   makeConnection(fd,'W');
-  
+
+  unsigned int mandar[10]={1,2,3,4,5,6,7,8,9,10};
+  sendData(mandar,10,fd);
+
   llClose(fd);
   return 0;
 }

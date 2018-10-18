@@ -10,7 +10,11 @@
 #define Crr0 0x05
 #define Crej1 0x81
 #define Crej0 0x01
-#define START 0x00
+#define S0 0x00
+#define S1 0x40
+#define ESCAPE 0x7d
+#define ESCAPEF 0x5e
+#define ESCAPEE 0x5d
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
