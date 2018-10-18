@@ -135,11 +135,10 @@ void sendData(unsigned int *data2,int length2,int fd)
 }
 
 
-void readData(int fd)
+void readData(int fd,unsigned int *guardar)
 {
   unsigned int value,bcc=0,i=0,confirmar=0;
   char *receive=malloc(255);
-  unsigned int guardar[1000];
   while(state2!=6){
     confirmar=0;
     bcc=0;
@@ -203,29 +202,22 @@ void readData(int fd)
       changestate2Read(guardar[i+2+help],bcc);
 
     }
-    if(confirmar!=0)
+    if(confirmar!=0 && state2==0)
     {
-      break;
+      char sendMessage2[255]="";
+      if(s==0)
+        sprintf(sendMessage2,"%x %x %x %x %x",FLAG,Arec,Crej0,Arec^Crej0,FLAG);
+      else
+        sprintf(sendMessage2,"%x %x %x %x %x",FLAG,Arec,Crej1,Arec^Crej1,FLAG);
+      llWrite(sendMessage2,fd);
     }
   }
-
-
   char sendMessage[255]="";
-  if(confirmar==0){
-    if(s==0)
-      sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Crr0,Arec^Crr0,FLAG);
-    else
-      sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Crr1,Arec^Crr1,FLAG);
-    llWrite(sendMessage,fd);
-  }
+  if(s==0)
+    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Crr0,Arec^Crr0,FLAG);
   else
-  {
-    if(s==0)
-      sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Crej0,Arec^Crej0,FLAG);
-    else
-      sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Crej1,Arec^Crej1,FLAG);
-    llWrite(sendMessage,fd);
-  }
+    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Crr1,Arec^Crr1,FLAG);
+  llWrite(sendMessage,fd);
 }
 
 void changestate2Read(unsigned int message,unsigned int bcc)

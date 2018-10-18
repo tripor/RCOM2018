@@ -14,8 +14,12 @@ int main(int argc, char** argv)
   int fd=llOpen(argv[1]);
 
   makeConnection(fd,'R');
-
-  readData(fd);
+  unsigned int guardar[100];
+  readData(fd,guardar);
+  for(int i=0;i<10;i++)
+  {
+    printf("valor: %x\n",guardar[i]);
+  }
 
   llClose(fd);
   return 0;

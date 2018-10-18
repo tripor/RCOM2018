@@ -3,4 +3,4 @@
 #include "shared.h"
 
 void sendData(unsigned int *data,int length,int fd);
-void readData(int fd);
+void readData(int fd,unsigned int *guardar);
