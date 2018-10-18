@@ -15,6 +15,7 @@
 #define ESCAPE 0x7d
 #define ESCAPEF 0x5e
 #define ESCAPEE 0x5d
+#define MaximumRead 10000
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
