@@ -17,6 +17,12 @@
 #define ESCAPEE 0x5d
 #define MaximumRead 10000
 
+//Application layer
+#define DataC 0x01
+#define StartC  0x02
+#define EndC  0x03
+#define SequenceN 255
+
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
