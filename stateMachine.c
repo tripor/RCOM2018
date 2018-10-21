@@ -69,7 +69,7 @@ void stateMachineUA(unsigned int message)
    switch(state_ua){
         case 0:
         if(message == FLAG)
-            stastate_uate = 1;
+            state_ua = 1;
         break;
 
         case 1:
