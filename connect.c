@@ -1,4 +1,5 @@
 #include "connect.h"
+#include "stateMachine.h"
 
 int connect_count=1;
 int connect_fd=0;
@@ -33,7 +34,7 @@ void makeConnectionReceiver(int fd)
     char sendMessage[255]="";
     //esperar pela mensagem de set do emissor
     printf("Waiting for the SET message from Sender...\n");
-    while(state!=5){
+    while(getStateSet()!=5){
       char *receive=malloc(255);
       llRead(&receive,fd);
       unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
@@ -43,7 +44,7 @@ void makeConnectionReceiver(int fd)
       stateMachineSET(c);
       stateMachineSET(bcc);
       stateMachineSET(flag2);
-      if(state!=5)printf("Wrong message received. Waiting for a new one...\n");
+      if(getStateSet()!=5)printf("Wrong message received. Waiting for a new one...\n");
     }
     //Mandar a mensagem de UA
     printf("SET message received. Sending UA message to Receiver...\n");
@@ -64,7 +65,7 @@ void makeConnectionSender(int fd)
     llWrite(sendMessage,fd);
     printf("SET message sent to Receiver. Waiting for response...\n");
     //Esperar pela resposta do recetor
-    while(state!=5){
+    while(getStateUa()!=5){
         char *receive=malloc(255);
         alarm(3);
         llRead(&receive,fd);
