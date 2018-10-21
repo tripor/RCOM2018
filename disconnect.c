@@ -9,6 +9,7 @@ int message_sent_receiver=0;
 
 void stateMachineReceive1(unsigned int message);
 void stateMachineSender(unsigned int message);
+void stateMachineReceive2(unsigned int message);
 
 /**
  * Signal alarm handler no caso de timeout do Sender

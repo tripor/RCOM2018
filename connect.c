@@ -55,7 +55,7 @@ void makeConnectionReceiver(int fd)
 
 void makeConnectionSender(int fd)
 {
-    connect=fd;
+    connect_fd=fd;
     connect_count=0;
     signal(SIGALRM, touchConnectSender);
     char sendMessage[255]="";
