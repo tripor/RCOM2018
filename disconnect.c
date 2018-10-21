@@ -37,7 +37,7 @@ void touchDisconnectSender()
 /**
  * Signal alarm handler no caso de timeout do Sender
  */
-void touchDisconnectSender()
+void touchDisconnectReceiver()
 {
     //Caso a messagem ainda não tenha sido recebida 
     if(message_sent_receiver==0)
@@ -52,7 +52,7 @@ void touchDisconnectSender()
         }
         char sendMessage[255]="";
         //Mandar outra vez a mensagem para o receiver
-        sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cdisc,Aemi^Cdisc,FLAG);
+        sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Cdisc,Arec^Cdisc,FLAG);
         llWrite(sendMessage,disconnect_fd);
         printf("DISC message resend, waiting for response...\n");
         alarm(3);
@@ -88,7 +88,7 @@ void disconnectSender(int fd)
     message_sent_sender=1;
 
     //Send UA message to Receiver
-    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Cdisc,Arec^Cdisc,FLAG);
+    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cua,Aemi^Cua,FLAG);
     llWrite(sendMessage,fd);
     printf("UA message sent\n");
 }
@@ -104,15 +104,15 @@ void disconnectReceiver(int fd)
 
     //Receber a mensagem de disconnect do Emissor
     while(state_disconnect!=5){
-      char *receive=malloc(255);
-      llRead(&receive,fd);
-      unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
-      sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
-      stateMachineReceive1(flag);
-      stateMachineReceive1(a);
-      stateMachineReceive1(c);
-      stateMachineReceive1(bcc);
-      stateMachineReceive1(flag2);
+        char *receive=malloc(255);
+        llRead(&receive,fd);
+        unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
+        sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
+        stateMachineReceive1(flag);
+        stateMachineReceive1(a);
+        stateMachineReceive1(c);
+        stateMachineReceive1(bcc);
+        stateMachineReceive1(flag2);
     }
     //Send message to Emissor
     printf("Sending DISC message to Sender...\n");
@@ -126,11 +126,11 @@ void disconnectReceiver(int fd)
         llRead(&receive,fd);
         unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
         sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
-        stateMachineSender(flag);
-        stateMachineSender(a);
-        stateMachineSender(c);
-        stateMachineSender(bcc);
-        stateMachineSender(flag2);
+        stateMachineReceive2(flag);
+        stateMachineReceive2(a);
+        stateMachineReceive2(c);
+        stateMachineReceive2(bcc);
+        stateMachineReceive2(flag2);
         if(state_disconnect!=5) printf("Got the wrong message. Retrying...\n");
     }
     printf("UA message received form Sender.\n");
