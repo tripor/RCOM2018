@@ -2,6 +2,7 @@
 #include "shared.h"
 #include "stateMachine.h"
 #include "data.h"
+#include "connect.h"
 
 int main(int argc, char** argv)
 {
@@ -13,7 +14,7 @@ int main(int argc, char** argv)
 
   int fd=llOpen(argv[1]);
 
-  makeConnection(fd,'R');
+  makeConnectionReceiver(fd);
   unsigned int guardar[100];
   readData(fd,guardar);
   for(int i=0;i<10;i++)

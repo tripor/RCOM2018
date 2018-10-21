@@ -1,66 +1,9 @@
 #include "shared.h"
 #include "stateMachine.h"
 
-char state = 0;
-int count=1;
-int program_fd=0;
-void touch()
-{
-	printf("alarme # %d\n", count);
-  count++;
-  if(count>=4)
-  {
-    printf("Couldn't make connection. Exiting...\n");
-    llClose(program_fd);
-    exit(1);
-  }
-  char sendMessage[255]="";
-  sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cset,Aemi^Cset,FLAG);
-  llWrite(sendMessage,program_fd);
-  alarm(3);
-}
-
-void makeConnection(int fd,char type)
-{
-  program_fd=fd;
-  signal(SIGALRM, touch);
-  if(type=='W')
-  {
-    char sendMessage[255]="";
-    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cset,Aemi^Cset,FLAG);
-    llWrite(sendMessage,fd);
-    while(state!=5){
-      char *receive=malloc(255);
-      alarm(3);
-      llRead(&receive,fd);
-      unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
-      sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
-      stateMachineUA(flag);
-      stateMachineUA(a);
-      stateMachineUA(c);
-      stateMachineUA(bcc);
-      stateMachineUA(flag2);
-    }
-
-  }
-  else if(type=='R')
-  {
-    char sendMessage[255]="";
-    while(state!=5){
-      char *receive=malloc(255);
-      llRead(&receive,fd);
-      unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
-      sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
-      stateMachineSET(flag);
-      stateMachineSET(a);
-      stateMachineSET(c);
-      stateMachineSET(bcc);
-      stateMachineSET(flag2);
-    }
-    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Cua,Arec^Cua,FLAG);
-    llWrite(sendMessage,fd);
-  }
-}
+int connect_state=0;
+int data_state=0;
+int disconnect_state=0;
 
 void stateMachineSET(unsigned int message)
 {
