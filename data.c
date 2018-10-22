@@ -147,7 +147,6 @@ void readData(int fd,unsigned char *guardar2)
     bcc=0;
     i=0;
     int k=0;
-    strcpy(receive,"");
     llRead(fd,receive);
     changestate2Read(receive[0],0);
     if(state2!=0)

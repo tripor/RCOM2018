@@ -24,7 +24,7 @@ int llWrite(int fd, unsigned char * buffer, int length)
 
 int llRead(int fd, unsigned char * buffer)
 {
-  unsigned char ler,buf[255]="";
+  unsigned char ler;
 	int i=0;
   while (1)
 	{
@@ -35,15 +35,14 @@ int llRead(int fd, unsigned char * buffer)
     }
     if (ler=='\0' && i>=1 )
       break;
-		buf[i]=ler;
+		buffer[i]=ler;
 		i++;
   }
-  strcpy(buffer,buf);
   return i;
 }
 
 
-int llOpen(unsigned char *canal)
+int llOpen( char *canal)
 {
   int fd;
 
@@ -87,9 +86,9 @@ void llClose(int fd)
 }
 
 
-void sendMessage(unsigned char *type,unsigned char * typeSender,int fd)
+void sendMessage(char *type,char * typeSender,int fd)
 {
-  unsigned unsigned char send[2],a,c;
+  unsigned char send[2],a,c;
   send[1]='\0';
   if(strcmp("W",typeSender)==0) a=Aemi;
   else a=Arec;
