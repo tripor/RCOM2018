@@ -111,7 +111,7 @@ void sendDataAux(char *data,int length,int fd)
 
 void sendData(char *data2,int length2,int fd)
 {
-	printf("Alarm signal subscribed.\n");
+	data_message_sent=0;
   sendDataAux(data2,length2,fd);
   program_fd2=fd;
   data=data2;
@@ -127,8 +127,11 @@ void sendData(char *data2,int length2,int fd)
 			turnAlarm(0);
 			continue;
 		}
+		printf("ccc: %c\n",receive[0]);
     changestate2Write(receive[0]);
   }
+	printf("Data sent.\n");
+	data_message_sent=1;
   if(s==0)s=1;
   else s=0;
 }
@@ -191,7 +194,6 @@ void readData(int fd,char *guardar2)
           bcc^=guardar[j];
           guardar2[k]=guardar[j];
         }
-				printf("bcc   9999 : %x\n",bcc);
       }
       changestate2Read(guardar[0],bcc);
       changestate2Read(guardar[1],bcc);
@@ -216,6 +218,7 @@ void readData(int fd,char *guardar2)
 				sendMessage("REJ0","R",fd);
       else
 				sendMessage("REJ1","R",fd);
+			printf("REJ message sent.\n");
     }
   }
 	printf("Data read. Sending RR message to Sender...\n");
@@ -223,6 +226,7 @@ void readData(int fd,char *guardar2)
 		sendMessage("RR0","R",fd);
   else
 		sendMessage("RR1","R",fd);
+	printf("RR message sent.\n");
 }
 
 void changestate2Read(char message,char bcc)
