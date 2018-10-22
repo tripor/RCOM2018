@@ -24,8 +24,8 @@ void applicationSend(unsigned char fd, char* path){
     //FAZER O WHILE E O SPLIT MESSAGE
   //  unsigned int* trama[] = malloc(size);
 
-   
-    
+
+
     sendControlPackage(fd, size, filename, 1);//end
 
     return;
@@ -102,7 +102,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
       {
         x = lengthSizeConstant - lengthSize;
 
-        ctrl_package[x+y+9] = size[y];
+      //  ctrl_package[x+y+9] = size[y];
         lengthSize--;
       }
 
@@ -115,7 +115,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 
 void receiveData(char* path, int fd){
 
-  STOP=FALSE;
+    int STOP=FALSE;
   unsigned char fullMessage[100];
   unsigned int thisByte;
 
@@ -150,13 +150,13 @@ void receiveData(char* path, int fd){
     printf("ERROR: Received data is wrong, doesn't have the correct type value for the information sent (0), current value: %x", type);
 
   length = fullMessage[2];
-  unsigned int* value[length];
+  unsigned int value[length];
 
   while(lengthCounter < length)
   {
-    value[lengthCounter] = fullMessage[2 + lengthCounter]
+    value[lengthCounter] = fullMessage[2 + lengthCounter];
     lengthCounter++;
-  } 
+  }
   fileSize = value;
 
 
@@ -166,11 +166,11 @@ void receiveData(char* path, int fd){
     printf("ERROR: Received data is wrong, doesn't have the correct type value for the information sent (1), current value: %x", type);
 
   length = fullMessage[4 + lengthCounter];
-  unsigned int* value[length];
+
   lengthCounter = 0;
   while(lengthCounter < length)
   {
-    value[lengthCounter] = fullMessage[2 + lengthCounter]
+    value[lengthCounter] = fullMessage[2 + lengthCounter];
     lengthCounter++;
   }
 
@@ -179,7 +179,8 @@ void receiveData(char* path, int fd){
   ctrlPackageSize = length*2 + 5;
 
   //Leitura Data Package
-  Cbyte = fullMessage[ctrlPackageSize + 1]
+  Cbyte = fullMessage[ctrlPackageSize + 1];
+
   if(CData != Cbyte)
     printf("ERROR: Received data is wrong, doesn't start with the data package, current value %x", Cbyte);
 
@@ -197,9 +198,9 @@ void receiveData(char* path, int fd){
     data_content[k] = fullMessage[ctrlPackageSize + 5 + dataCounter];
     dataCounter++;
   }
-
+/*
   //Leitura control package END
-  unsigned int tmpPackage1[ctrlPackageSize], tmpPackage2[ctrlPackageSize];
+  unsigned int tmpPackage1, tmpPackage2;
 
   tmpPackage1 = fullMessage >> (ctrlPackageSize + 5 + dataCounter);
   tmpPackage2 = fullMessage%(ctrlPackageSize + 5 + dataCounter);
@@ -213,11 +214,11 @@ void receiveData(char* path, int fd){
 
     if(tmpPackage2 != tmpPackage1){
     printf("ERROR: Control packages don't matcH");
-    }
+  }*/
 
     return;
 
-    
+
 
 
 }

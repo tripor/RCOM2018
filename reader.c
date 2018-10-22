@@ -16,6 +16,8 @@ int main(int argc, char** argv)
   int fd=llOpen(argv[1]);
 
   makeConnectionReceiver(fd);
+
+  
   unsigned char guardar[100];
   guardar[0]=70;
   readData(fd,guardar);
@@ -24,8 +26,12 @@ int main(int argc, char** argv)
     printf("valor: %x\n",guardar[i]);
   }
 
+
+
   printf("Disconnecting...\n");
   disconnectReceiver(fd);
+
+
 
   llClose(fd);
   return 0;

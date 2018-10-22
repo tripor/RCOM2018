@@ -10,4 +10,4 @@ void turnAlarm(int state);
 void sendMessage( char *type, char * typeSender,int fd);
 
 int llOpen();
-void llClose(int fd);
+int llClose(int fd);

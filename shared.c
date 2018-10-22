@@ -78,11 +78,11 @@ int llOpen( char *canal)
   return fd;
 }
 
-void llClose(int fd)
+int llClose(int fd)
 {
 	sleep(2);
   tcsetattr(fd,TCSANOW,oldtio);
-  close(fd);
+  return close(fd);
 }
 
 
