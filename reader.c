@@ -22,6 +22,9 @@ int main(int argc, char** argv)
     printf("valor: %x\n",guardar[i]);
   }
 
+  printf("Disconnecting...\n");
+  disconnectReceiver(fd);
+
   llClose(fd);
   return 0;
 }

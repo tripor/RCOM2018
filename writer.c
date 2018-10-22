@@ -19,7 +19,8 @@ int main(int argc, char** argv)
   unsigned int mandar[10]={1,2,3,4,5,6,7,8,9,10};
   sendData(mandar,10,fd);
   sendData(mandar,10,fd);
-
+  printf("Disconnecting...\n");
+  disconnectSender(fd);
   llClose(fd);
   return 0;
 }

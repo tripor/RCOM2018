@@ -15,7 +15,18 @@ int getStateUa()
 {
     return state_ua;
 }
-
+int getStateDisc()
+{
+    return disconnect_state;
+}
+void resetStates()
+{
+  state_set=0;
+  state_ua=0;
+  data_state=0;
+  disconnect_state=0;
+}
+//
 void stateMachineSET(unsigned int message)
 {
 
@@ -63,7 +74,7 @@ void stateMachineSET(unsigned int message)
 
 
 }
-
+//
 void stateMachineUA(unsigned int message)
 {
    switch(state_ua){
@@ -108,4 +119,123 @@ void stateMachineUA(unsigned int message)
 
 }
 
+//
+void stateMachineDisc(unsigned int message)
+{
+    switch(disconnect_state){
+        case 0:
+            if(message == FLAG)
+                disconnect_state = 1;
+            break;
+        case 1:
+            if(message == Arec)
+                disconnect_state = 2;
+            else if(message != FLAG)
+                disconnect_state = 0;
+            break;
+        case 2:
+            if(message == Cdisc)
+                disconnect_state = 3;
+            else if (message == FLAG)
+                disconnect_state = 1;
+            else
+                disconnect_state = 0;
+            break;
+        case 3:
+            if(message == (Arec^Cdisc))
+                disconnect_state = 4;
+            else if (message == FLAG)
+                disconnect_state = 1;
+            else
+                disconnect_state = 0;
+            break;
+        case 4:
+            if(message == FLAG)
+                disconnect_state = 5;
+            else disconnect_state = 0;
 
+            break;
+        default: disconnect_state = 0;
+
+    }
+}
+
+void stateMachineDisc2(unsigned int message)
+{
+    switch(disconnect_state){
+        case 0:
+            if(message == FLAG)
+                disconnect_state = 1;
+            break;
+        case 1:
+            if(message == Aemi)
+                disconnect_state = 2;
+            else if(message != FLAG)
+                disconnect_state = 0;
+            break;
+        case 2:
+            if(message == Cua)
+                disconnect_state = 3;
+            else if (message == FLAG)
+                disconnect_state = 1;
+            else
+                disconnect_state = 0;
+            break;
+        case 3:
+            if(message == (Aemi^Cua))
+                disconnect_state = 4;
+            else if (message == FLAG)
+                disconnect_state = 1;
+            else
+                disconnect_state = 0;
+            break;
+        case 4:
+            if(message == FLAG)
+                disconnect_state = 5;
+            else disconnect_state = 0;
+
+            break;
+        default: disconnect_state = 0;
+
+    }
+}
+
+void stateMachineUaDisc(unsigned int message)
+{
+    switch(disconnect_state){
+        case 0:
+            if(message == FLAG)
+                disconnect_state = 1;
+            break;
+        case 1:
+            if(message == Aemi)
+                disconnect_state = 2;
+            else if(message != FLAG)
+                disconnect_state = 0;
+            break;
+        case 2:
+            if(message == Cdisc)
+                disconnect_state = 3;
+            else if (message == FLAG)
+                disconnect_state = 1;
+            else
+                disconnect_state = 0;
+            break;
+        case 3:
+            if(message == (Aemi^Cdisc))
+                disconnect_state = 4;
+            else if (message == FLAG)
+                disconnect_state = 1;
+            else
+                disconnect_state = 0;
+            break;
+        case 4:
+            if(message == FLAG)
+                disconnect_state = 5;
+            else disconnect_state = 0;
+
+            break;
+        default: disconnect_state = 0;
+
+    }
+}
