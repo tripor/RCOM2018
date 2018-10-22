@@ -6,7 +6,7 @@ struct termios *oldtio,*newtio;
 int llWrite(int fd, char * buffer, int length)
 {
   int res=write(fd,buffer,length);
-  printf("Bytes send: %d Text: %s\n",res,buffer);
+  printf("Bytes send: %d Text: %x\n",res,buffer[0]);
   return res;
 }
 
@@ -17,7 +17,7 @@ int llRead(int fd, char * buffer)
   while (1)
 	{
    	read(fd,&ler,1);
-    printf("Byte read: %d Text: %c\n",1,ler);
+    printf("Byte read: %d Text: %x\n",1,ler);
     if (ler=='\0' )
       break;
 		buf[i]=ler;
