@@ -16,7 +16,7 @@ void applicationSend(unsigned char fd, char* path){
     int size;
     fseek(file,0,2);
     size = ftell(file);
-    unsigned char *filename = basename(path);
+    char *filename = basename(path);
 
 
     sendControlPackage(fd, size, filename, 0); //start
@@ -37,19 +37,15 @@ void dataSplitting(){
 
 void sendDataPackage(int size, int filePacket, int fd){ //a rever...
 
-    char* data_package = (char*) malloc(size + 4);
-    char buffer;
+    unsigned char* data_package = (char*) malloc(size + 4);
+    unsigned char buffer;
     unsigned int l2 = size/256;
     unsigned int l1 = size%256;
 
-    sprintf(buffer, "%d", DataC);
-    strcat(data_package, buffer);
-    sprintf(buffer, "%d", SequenceN);
-    strcat(data_package, buffer);
-    sprintf(buffer, "%d", l2);
-    strcat(data_package, buffer);
-    sprintf(buffer, "%d", l1);
-    strcat(data_package, buffer);
+    data_package[0] = DataC;
+    data_package[1] = SequenceN;
+    data_package[2] = l2;
+    data_package[3] = l1;
     memcpy(data_package, filePacket, size);
 
     sendData((unsigned char)data_package, size, fd);
@@ -64,7 +60,6 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
     unsigned int typeSize = 0;
     unsigned int typeName = 1;
     unsigned int lengthName = strlen(filename);
-    unsigned int valuePath = filename;
     sprintf(stringSize, "%d", size);
     unsigned int lengthSize = strlen(stringSize);
     unsigned int valueSize = size;
@@ -77,7 +72,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
       ctrl_package[0] = StartC;
       else if(startOrEnd == 1)//end
       ctrl_package[0] = EndC;
-      else return -1;
+      else return;
 
       ctrl_package[1] = typeSize;
       ctrl_package[2] = lengthSize;
@@ -91,7 +86,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
       ctrl_package[8] = lengthName;
 
       unsigned int lengthNameConstant = lengthName;
-      unsigned int x;
+      unsigned int x = 0;
 
       while(lengthName > 0)
       {
@@ -99,6 +94,16 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 
         ctrl_package[x+9] = filename[x];
         lengthName--;
+      }
+
+      unsigned int lengthSizeConstant = lengthSize;
+      unsigned int y = 0;
+      while(lengthSize > 0)
+      {
+        x = lengthSizeConstant - lengthSize;
+
+        ctrl_package[x+y+9] = size[y];
+        lengthSize--;
       }
 
 
@@ -188,7 +193,7 @@ void receiveData(char* path, int fd){
   k = l2 * 256 + l1;
   unsigned int data_content[k];
 
-  while(dataCounter < k)){
+  while(dataCounter < k){
     data_content[k] = fullMessage[ctrlPackageSize + 5 + dataCounter];
     dataCounter++;
   }
@@ -199,12 +204,12 @@ void receiveData(char* path, int fd){
   tmpPackage1 = fullMessage >> (ctrlPackageSize + 5 + dataCounter);
   tmpPackage2 = fullMessage%(ctrlPackageSize + 5 + dataCounter);
 
-  tmpPackage1 = tmpPackage1 >> 1;
+  tmpPackage1 = (tmpPackage1 >> 1);
 
   if(tmpPackage2[0] == EndC)
     printf("ERROR: Received data is wrong, doesn't start with the correct control package, current value: %x", tmpPackage2[0]);
 
-    tmpPackage2 = tmpPackage2 >> 1;
+    tmpPackage2 = (tmpPackage2 >> 1);
 
     if(tmpPackage2 != tmpPackage1){
     printf("ERROR: Control packages don't matcH");
