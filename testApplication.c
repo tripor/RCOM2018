@@ -2,7 +2,7 @@
 
 //Peço desde já desculpa pelo esparguete, mas acho que nos sítios em que esteja mal dê para perceber bem a ideia
 
-void applicationSend(unsigned char fd, unsigned char* path){
+void applicationSend(unsigned char fd, char* path){
 
 
 
@@ -22,13 +22,9 @@ void applicationSend(unsigned char fd, unsigned char* path){
     sendControlPackage(fd, size, filename, 0); //start
 
     //FAZER O WHILE E O SPLIT MESSAGE
-    unsigned int* trama[] = malloc(size);
+  //  unsigned int* trama[] = malloc(size);
 
-    for(unsigned int i = 0; i < ; i++)
-    {
-
-    }
-
+   
     
     sendControlPackage(fd, size, filename, 1);//end
 
@@ -41,8 +37,8 @@ void dataSplitting(){
 
 void sendDataPackage(int size, int filePacket, int fd){ //a rever...
 
-    unsigned unsigned char* data_package = (unsigned unsigned char*) malloc(size + 4);
-    unsigned unsigned char buffer;
+    char* data_package = (char*) malloc(size + 4);
+    char buffer;
     unsigned int l2 = size/256;
     unsigned int l1 = size%256;
 
@@ -56,15 +52,15 @@ void sendDataPackage(int size, int filePacket, int fd){ //a rever...
     strcat(data_package, buffer);
     memcpy(data_package, filePacket, size);
 
-    sendData(data_package, size, fd);
+    sendData((unsigned char)data_package, size, fd);
     return;
 }
 
-void sendControlPackage(int fd, int size, unsigned char* filename, int startOrEnd){
+void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 
 
 
-    unsigned char * stringSize;
+    char * stringSize;
     unsigned int typeSize = 0;
     unsigned int typeName = 1;
     unsigned int lengthName = strlen(filename);
@@ -74,7 +70,7 @@ void sendControlPackage(int fd, int size, unsigned char* filename, int startOrEn
     unsigned int valueSize = size;
 
     int packageSize = 5 + lengthName + lengthSize; //C + TLV1 + TLV2
-    unsigned char ctrl_package[packageSize];
+    char ctrl_package[packageSize];
 
 
       if(startOrEnd == 0)//start
@@ -112,10 +108,10 @@ void sendControlPackage(int fd, int size, unsigned char* filename, int startOrEn
 
 }
 
-void receiveData(unsigned char* path, int fd){
+void receiveData(char* path, int fd){
 
   STOP=FALSE;
-  unsigned int* fullMessage[100];
+  unsigned char fullMessage[100];
   unsigned int thisByte;
 
   //Control Package
@@ -136,7 +132,7 @@ void receiveData(unsigned char* path, int fd){
   unsigned int dataCounter = 0;
 
 
-  readData(int fd,unsigned int *fullMessage);
+  readData(fd,fullMessage);
 
 
 //Leitura control package START

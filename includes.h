@@ -7,4 +7,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <libgen.h>
 #include "macros.h"
+
