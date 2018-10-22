@@ -35,7 +35,6 @@ void makeConnectionReceiver(int fd)
       char *receive=malloc(2);
       llRead(fd,receive);
       stateMachineSET(receive[0]);
-      printf("estado:%d\n",getStateSet());
     }
     //Mandar a mensagem de UA
     printf("SET message received. Sending UA message to Receiver...\n");

@@ -17,8 +17,7 @@ int llRead(int fd, char * buffer)
   while (1)
 	{
    	read(fd,&ler,1);
-    printf("Byte read: %d Text: %x\n",1,ler);
-    if (ler=='\0' )
+    if (ler=='\0' && i>=1 )
       break;
 		buf[i]=ler;
 		i++;

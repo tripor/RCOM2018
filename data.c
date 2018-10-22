@@ -78,6 +78,7 @@ void sendDataAux(char *data,int length,int fd)
   for(int i=0;i<length;i++)
   {
     bcc^=data[i];
+		printf("bcc:%x\n",bcc);
   }
 
 	send[0]=FLAG;
@@ -127,6 +128,7 @@ void readData(int fd,char *guardar2)
   unsigned int bcc=0,i=0,confirmar=0;
   char *receive=malloc(2);
   char guardar[1000];
+	printf("Reading data...\n");
   while(state2!=6){
     confirmar=0;
     bcc=0;
@@ -156,22 +158,6 @@ void readData(int fd,char *guardar2)
           i--;
           help++;
         }
-
-      changestate2Read(guardar[0],bcc);
-      changestate2Read(guardar[1],bcc);
-      if(state2==4)confirmar++;
-      if(unStuff(guardar[2],guardar[3])==0)
-        changestate2Read(guardar[2],bcc);
-      else
-        changestate2Read(unStuff(guardar[2],guardar[3]),bcc);
-      if(unStuff(guardar[i+help],guardar[i+1+help])==0)
-        changestate2Read(guardar[i+1+help],bcc);
-      else
-        changestate2Read(unStuff(guardar[i+help],guardar[i+1+help]),bcc);
-      changestate2Read(guardar[i+2+help],bcc);
-
-			guardar[i+help]='\0';
-
 			for(;j<i+help;j++,k++)
       {
         unsigned int un=unStuff(guardar[j],guardar[j+1]);
@@ -194,7 +180,22 @@ void readData(int fd,char *guardar2)
           bcc^=guardar[j];
           guardar2[k]=guardar[j];
         }
+				printf("bcc   9999 : %x\n",bcc);
       }
+      changestate2Read(guardar[0],bcc);
+      changestate2Read(guardar[1],bcc);
+      if(state2==4)confirmar++;
+      if(unStuff(guardar[2],guardar[3])==0)
+        changestate2Read(guardar[2],bcc);
+      else
+        changestate2Read(unStuff(guardar[2],guardar[3]),bcc);
+      if(unStuff(guardar[i+help],guardar[i+1+help])==0)
+        changestate2Read(guardar[i+1+help],bcc);
+      else
+        changestate2Read(unStuff(guardar[i+help],guardar[i+1+help]),bcc);
+      changestate2Read(guardar[i+2+help],bcc);
+
+
 
     }
     if(confirmar!=0 && state2==0)
@@ -205,6 +206,7 @@ void readData(int fd,char *guardar2)
 				sendMessage("REJ1","R",fd);
     }
   }
+	printf("Data read. Sending RR message to Sender...\n");
   if(s==0)
 		sendMessage("RR0","R",fd);
   else
@@ -213,6 +215,7 @@ void readData(int fd,char *guardar2)
 
 void changestate2Read(char message,char bcc)
 {
+printf("start:%d %x bcc:%x\n",state2,message,bcc);
     switch(state2){
       case 0:
       if(message == FLAG)
