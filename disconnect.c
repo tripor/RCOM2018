@@ -30,7 +30,7 @@ void touchDisconnectSender()
         //Mandar outra vez a mensagem para o receiver
         sendMessage("DISC","W",disconnect_fd);
         printf("DISC message resend, waiting for response...\n");
-        alarm(3);
+        turnAlarm(1);
     }
 }
 /**
@@ -52,7 +52,7 @@ void touchDisconnectReceiver()
         //Mandar outra vez a mensagem para o receiver
         sendMessage("DISC","R",disconnect_fd);
         printf("DISC message resend, waiting for response...\n");
-        alarm(3);
+        turnAlarm(1);
     }
 }
 void disconnectSender(int fd)
@@ -60,15 +60,20 @@ void disconnectSender(int fd)
     disconnect_fd=fd;
     count_disconnect=0;
     message_sent_sender=0;
-    signal(SIGALRM, touchDisconnectSender);
     //Enviar a mensagem de disconnect para o Receiver
     sendMessage("DISC","W",fd);
     printf("Mensage DISC sent to Receiver.Waiting response...\n");
     //Receber a mensagem de disconnect do Receiver
     while(getStateDisc()!=5){
+      signal(SIGALRM, touchDisconnectSender);
         unsigned char *receive=malloc(2);
         alarm(3);
         llRead(fd,receive);
+        if(getAlarm()==1)
+        {
+          turnAlarm(0);
+          continue;
+        }
         stateMachineDisc(receive[0]);
         if(getStateDisc()!=5) printf("Got the wrong message. Retrying...\n");
     }
@@ -84,14 +89,12 @@ void disconnectReceiver(int fd)
     disconnect_fd=fd;
     count_disconnect=0;
     message_sent_receiver=0;
-    signal(SIGALRM, touchDisconnectReceiver);
 
     //Receber a mensagem de disconnect do Emissor
     while(getStateDisc()!=5){
         unsigned char *receive=malloc(2);
         llRead(fd,receive);
         stateMachineDisc2(receive[0]);
-        if(getStateDisc()!=5) printf("Got the wrong message. Retrying...\n");
     }
     //Send message to Emissor
     printf("Sending DISC message to Sender...\n");
@@ -99,11 +102,16 @@ void disconnectReceiver(int fd)
     printf("DISC message sent to Sender. Waiting response...\n");
     resetStates();
     while(getStateDisc()!=5){
+        signal(SIGALRM, touchDisconnectReceiver);
         unsigned char *receive=malloc(2);
         alarm(3);
         llRead(fd,receive);
+        if(getAlarm()==1)
+        {
+          turnAlarm(0);
+          continue;
+        }
         stateMachineUaDisc(receive[0]);
-        if(getStateDisc()!=5) printf("Got the wrong message. Retrying...\n");
     }
     printf("UA message received form Sender.\n");
 
