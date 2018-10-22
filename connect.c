@@ -46,6 +46,7 @@ void makeConnectionSender(int fd)
 {
     connect_fd=fd;
     connect_count=0;
+    printf("Alarm signal subscribed.\n");
     signal(SIGALRM, touchConnectSender);
     //Mandar mensagem de SET
     printf("Sending SET message to Receiver...\n");

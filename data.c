@@ -78,7 +78,6 @@ void sendDataAux(char *data,int length,int fd)
   for(int i=0;i<length;i++)
   {
     bcc^=data[i];
-		printf("bcc:%x\n",bcc);
   }
 
 	send[0]=FLAG;
@@ -107,11 +106,13 @@ void sendDataAux(char *data,int length,int fd)
 
 void sendData(char *data2,int length2,int fd)
 {
+	printf("Alarm signal subscribed.\n");
   signal(SIGALRM, touch2);
   sendDataAux(data2,length2,fd);
   program_fd2=fd;
   data=data2;
   length=length2;
+	printf("Data sent. Waiting for the response...\n");
   while(state2!=5){
     char *receive=malloc(2);
     alarm(3);
@@ -158,7 +159,7 @@ void readData(int fd,char *guardar2)
           i--;
           help++;
         }
-			for(;j<i+help;j++,k++)
+			for(;j<=i;j++,k++)
       {
         unsigned int un=unStuff(guardar[j],guardar[j+1]);
         if(j!=i)
@@ -200,6 +201,7 @@ void readData(int fd,char *guardar2)
     }
     if(confirmar!=0 && state2==0)
     {
+			printf("Sending REJ message to Sender...\n");
       if(s==0)
 				sendMessage("REJ0","R",fd);
       else
@@ -215,7 +217,6 @@ void readData(int fd,char *guardar2)
 
 void changestate2Read(char message,char bcc)
 {
-printf("start:%d %x bcc:%x\n",state2,message,bcc);
     switch(state2){
       case 0:
       if(message == FLAG)
