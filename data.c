@@ -1,15 +1,14 @@
 #include "data.h"
 
-void changestate2Read(unsigned int message,unsigned int bcc);
-void changestate2Write(unsigned int message);
-void sendDataAux(unsigned int *data,int length,int fd);
+void changestate2Read(char message,char bcc);
+void changestate2Write(char message);
 
 int s=0;
 int state2=0;
 
 int count2=1;
 int program_fd2=0;
-unsigned int *data;
+char *data;
 int length;
 void touch2()
 {
@@ -26,37 +25,33 @@ void touch2()
   alarm(3);
 }
 
-void writeStuff(unsigned int data,int fd)
+void writeStuff(char data,int fd)
 {
-  char sendMessage[255]="";
+  char send[2];
+	send[1]='\0';
   if(data==FLAG)
   {
-    strcpy(sendMessage,"");
-    sprintf(sendMessage,"%x",ESCAPE);
-    llWrite(sendMessage,fd);
-    strcpy(sendMessage,"");
-    sprintf(sendMessage,"%x",ESCAPEF);
-    llWrite(sendMessage,fd);
+		send[0]=ESCAPE;
+	  llWrite(fd,send,2);
+		send[0]=ESCAPEF;
+	  llWrite(fd,send,2);
   }
   else if(data==ESCAPE)
   {
-    strcpy(sendMessage,"");
-    sprintf(sendMessage,"%x",ESCAPE);
-    llWrite(sendMessage,fd);
-    strcpy(sendMessage,"");
-    sprintf(sendMessage,"%x",ESCAPEE);
-    llWrite(sendMessage,fd);
+		send[0]=ESCAPE;
+	  llWrite(fd,send,2);
+		send[0]=ESCAPEE;
+	  llWrite(fd,send,2);
 
   }
   else
   {
-      strcpy(sendMessage,"");
-      sprintf(sendMessage,"%x",data);
-      llWrite(sendMessage,fd);
+		send[0]=data;
+	  llWrite(fd,send,2);
   }
 }
 
-unsigned int unStuff(unsigned int first,unsigned int second)
+char unStuff(char first,char second)
 {
   if(first==ESCAPE && second == ESCAPEF)
   {
@@ -70,10 +65,11 @@ unsigned int unStuff(unsigned int first,unsigned int second)
     return 0x00;
 }
 
-void sendDataAux(unsigned int *data,int length,int fd)
+void sendDataAux(char *data,int length,int fd)
 {
-  unsigned int bcc=0;
-  char sendMessage[255]="";
+  char bcc=0;
+  char send[2];
+	send[1]='\0';
   bcc^=Aemi;
   if(s==0)
     bcc^=S0;
@@ -84,19 +80,17 @@ void sendDataAux(unsigned int *data,int length,int fd)
     bcc^=data[i];
   }
 
-  sprintf(sendMessage,"%x",FLAG);
-  llWrite(sendMessage,fd);
-  strcpy(sendMessage,"");
-  sprintf(sendMessage,"%x",Aemi);
-  llWrite(sendMessage,fd);
-  strcpy(sendMessage,"");
+	send[0]=FLAG;
+  llWrite(fd,send,2);
+	send[0]=Aemi;
+  llWrite(fd,send,2);
   if(s==0){
-    sprintf(sendMessage,"%x",S0);
+		send[0]=S0;
   }
   else{
-    sprintf(sendMessage,"%x",S1);
+		send[0]=S1;
   }
-  llWrite(sendMessage,fd);
+  llWrite(fd,send,2);
 
   writeStuff(bcc,fd);
 
@@ -106,12 +100,11 @@ void sendDataAux(unsigned int *data,int length,int fd)
   }
 
   writeStuff(bcc,fd);
-  strcpy(sendMessage,"");
-  sprintf(sendMessage,"%x",FLAG);
-  llWrite(sendMessage,fd);
+	send[0]=FLAG;
+  llWrite(fd,send,2);
 }
 
-void sendData(unsigned int *data2,int length2,int fd)
+void sendData(char *data2,int length2,int fd)
 {
   signal(SIGALRM, touch2);
   sendDataAux(data2,length2,fd);
@@ -119,45 +112,36 @@ void sendData(unsigned int *data2,int length2,int fd)
   data=data2;
   length=length2;
   while(state2!=5){
-    char *receive=malloc(255);
+    char *receive=malloc(2);
     alarm(3);
-    llRead(&receive,fd);
-    unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
-    sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
-    changestate2Write(flag);
-    changestate2Write(a);
-    changestate2Write(c);
-    changestate2Write(bcc);
-    changestate2Write(flag2);
+    llRead(fd,receive);
+    changestate2Write(receive[0]);
   }
   if(s==0)s=1;
   else s=0;
 }
 
 
-void readData(int fd,unsigned int *guardar2)
+void readData(int fd,char *guardar2)
 {
-  unsigned int value,bcc=0,i=0,confirmar=0;
-  char *receive=malloc(255);
-  unsigned int guardar[100];
+  unsigned int bcc=0,i=0,confirmar=0;
+  char *receive=malloc(2);
+  char guardar[1000];
   while(state2!=6){
     confirmar=0;
     bcc=0;
     i=0;
     int k=0;
     strcpy(receive,"");
-    llRead(&receive,fd);
-    sscanf(receive,"%x",&value);
-    changestate2Read(value,0);
+    llRead(fd,receive);
+    changestate2Read(receive[0],0);
     if(state2!=0)
     {
-      value=0;
-      while(value!=FLAG && i<=MaximumRead)
+      receive[0]=0;
+      while(receive[0]!=FLAG && i<=MaximumRead)
       {
-        strcpy(receive,"");
-        llRead(&receive,fd);
-        sscanf(receive,"%x",&value);
-        guardar[i]=value;
+        llRead(fd,receive);
+        guardar[i]=receive[0];
         i++;
       }
       if(i>MaximumRead) continue;
@@ -172,7 +156,23 @@ void readData(int fd,unsigned int *guardar2)
           i--;
           help++;
         }
-      for(;j<=i;j++,k++)
+
+      changestate2Read(guardar[0],bcc);
+      changestate2Read(guardar[1],bcc);
+      if(state2==4)confirmar++;
+      if(unStuff(guardar[2],guardar[3])==0)
+        changestate2Read(guardar[2],bcc);
+      else
+        changestate2Read(unStuff(guardar[2],guardar[3]),bcc);
+      if(unStuff(guardar[i+help],guardar[i+1+help])==0)
+        changestate2Read(guardar[i+1+help],bcc);
+      else
+        changestate2Read(unStuff(guardar[i+help],guardar[i+1+help]),bcc);
+      changestate2Read(guardar[i+2+help],bcc);
+
+			guardar[i+help]='\0';
+
+			for(;j<i+help;j++,k++)
       {
         unsigned int un=unStuff(guardar[j],guardar[j+1]);
         if(j!=i)
@@ -195,39 +195,23 @@ void readData(int fd,unsigned int *guardar2)
           guardar2[k]=guardar[j];
         }
       }
-      changestate2Read(guardar[0],bcc);
-      changestate2Read(guardar[1],bcc);
-      if(state2==4)confirmar++;
-      if(unStuff(guardar[2],guardar[3])==0)
-        changestate2Read(guardar[2],bcc);
-      else
-        changestate2Read(unStuff(guardar[2],guardar[3]),bcc);
-      if(unStuff(guardar[i+help],guardar[i+1+help])==0)
-        changestate2Read(guardar[i+1+help],bcc);
-      else
-        changestate2Read(unStuff(guardar[i+help],guardar[i+1+help]),bcc);
-      changestate2Read(guardar[i+2+help],bcc);
 
     }
     if(confirmar!=0 && state2==0)
     {
-      char sendMessage2[255]="";
       if(s==0)
-        sprintf(sendMessage2,"%x %x %x %x %x",FLAG,Arec,Crej0,Arec^Crej0,FLAG);
+				sendMessage("REJ0","R",fd);
       else
-        sprintf(sendMessage2,"%x %x %x %x %x",FLAG,Arec,Crej1,Arec^Crej1,FLAG);
-      llWrite(sendMessage2,fd);
+				sendMessage("REJ1","R",fd);
     }
   }
-  char sendMessage[255]="";
   if(s==0)
-    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Crr0,Arec^Crr0,FLAG);
+		sendMessage("RR0","R",fd);
   else
-    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Crr1,Arec^Crr1,FLAG);
-  llWrite(sendMessage,fd);
+		sendMessage("RR1","R",fd);
 }
 
-void changestate2Read(unsigned int message,unsigned int bcc)
+void changestate2Read(char message,char bcc)
 {
     switch(state2){
       case 0:
@@ -283,7 +267,7 @@ void changestate2Read(unsigned int message,unsigned int bcc)
       default: state2 = 0;
     }
 }
-void changestate2Write(unsigned int message)
+void changestate2Write(char message)
 {
   switch(state2){
     case 0:

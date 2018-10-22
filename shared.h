@@ -1,7 +1,10 @@
 #include "includes.h"
+#include "macros.h"
 
-void llWrite(char *send,int fd);
-void llRead(char ** guardar,int fd);
+int llWrite(int fd, char * buffer, int length);
+int llRead(int fd, char * buffer);
+
+void sendMessage(char *type,char * typeSender,int fd);
 
 int llOpen();
 void llClose(int fd);

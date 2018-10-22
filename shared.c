@@ -1,29 +1,30 @@
 #include "shared.h"
 
-volatile int STOP=FALSE;
 struct termios *oldtio,*newtio;
 
 
-void llWrite(char *send,int fd)
+int llWrite(int fd, char * buffer, int length)
 {
-  int res=write(fd,send,strlen(send)+1);
-  printf("Bytes send: %d Text: %s\n",res,send);
+  int res=write(fd,buffer,length);
+  printf("Bytes send: %d Text: %s\n",res,buffer);
+  return res;
 }
 
-void llRead(char **guardar,int fd)
+int llRead(int fd, char * buffer)
 {
-  STOP=FALSE;
   char ler,buf[255]="";
 	int i=0;
-  while (STOP==FALSE)
+  while (1)
 	{
    	read(fd,&ler,1);
+    printf("Byte read: %d Text: %c\n",1,ler);
+    if (ler=='\0' )
+      break;
 		buf[i]=ler;
 		i++;
-    if (ler=='\0' )
-		  STOP=TRUE;
   }
-  strcpy(*guardar,buf);
+  strcpy(buffer,buf);
+  return i;
 }
 
 
@@ -68,4 +69,35 @@ void llClose(int fd)
 	sleep(2);
   tcsetattr(fd,TCSANOW,oldtio);
   close(fd);
+}
+
+
+void sendMessage(char *type,char * typeSender,int fd)
+{
+  char send[2],a,c;
+  send[1]='\0';
+  if(strcmp("W",typeSender)==0) a=Aemi;
+  else a=Arec;
+  if(strcmp("SET",type)==0) c=Cset;
+  else if(strcmp("UA",type)==0) c=Cua;
+  else if(strcmp("DISC",type)==0) c=Cdisc;
+  else if(strcmp("RR1",type)==0) c=Crr1;
+  else if(strcmp("RR0",type)==0) c=Crr0;
+  else if(strcmp("REJ1",type)==0) c=Crej1;
+  else if(strcmp("REJ2",type)==0) c=Crej0;
+
+  send[0]=FLAG;
+  llWrite(fd,send,2);
+
+  send[0]=a;
+  llWrite(fd,send,2);
+
+  send[0]=c;
+  llWrite(fd,send,2);
+
+  send[0]=a^c;
+  llWrite(fd,send,2);
+
+  send[0]=FLAG;
+  llWrite(fd,send,2);
 }

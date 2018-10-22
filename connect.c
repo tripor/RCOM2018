@@ -17,11 +17,9 @@ void touchConnectSender()
             llClose(connect_fd);
             exit(1);
         }
-        char sendMessage[255]="";
         //Resending message
         printf("Resending SET message to Receiver...\n");
-        sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cset,Aemi^Cset,FLAG);
-        llWrite(sendMessage,connect_fd);
+        sendMessage("SET","W",connect_fd);
         printf("SET message resent...\n");
         alarm(3);
     }
@@ -31,25 +29,17 @@ void makeConnectionReceiver(int fd)
 {
     connect_fd=fd;
     connect_count=0;
-    char sendMessage[255]="";
     //esperar pela mensagem de set do emissor
     printf("Waiting for the SET message from Sender...\n");
     while(getStateSet()!=5){
-      char *receive=malloc(255);
-      llRead(&receive,fd);
-      unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
-      sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
-      stateMachineSET(flag);
-      stateMachineSET(a);
-      stateMachineSET(c);
-      stateMachineSET(bcc);
-      stateMachineSET(flag2);
+      char *receive=malloc(2);
+      llRead(fd,receive);
+      stateMachineSET(receive[0]);
       if(getStateSet()!=5)printf("Wrong message received. Waiting for a new one...\n");
     }
     //Mandar a mensagem de UA
     printf("SET message received. Sending UA message to Receiver...\n");
-    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Arec,Cua,Arec^Cua,FLAG);
-    llWrite(sendMessage,fd);
+    sendMessage("UA","R",fd);
     printf("UA message sent to Receiver.\n");
 }
 
@@ -58,24 +48,16 @@ void makeConnectionSender(int fd)
     connect_fd=fd;
     connect_count=0;
     signal(SIGALRM, touchConnectSender);
-    char sendMessage[255]="";
     //Mandar mensagem de SET
     printf("Sending SET message to Receiver...\n");
-    sprintf(sendMessage,"%x %x %x %x %x",FLAG,Aemi,Cset,Aemi^Cset,FLAG);
-    llWrite(sendMessage,fd);
+    sendMessage("SET","W",fd);
     printf("SET message sent to Receiver. Waiting for response...\n");
     //Esperar pela resposta do recetor
     while(getStateUa()!=5){
-        char *receive=malloc(255);
+        char *receive=malloc(2);
         alarm(3);
-        llRead(&receive,fd);
-        unsigned int flag=0,a=0,c=0,bcc=0,flag2=0;
-        sscanf(receive,"%x %x %x %x %x",&flag,&a,&c,&bcc,&flag2);
-        stateMachineUA(flag);
-        stateMachineUA(a);
-        stateMachineUA(c);
-        stateMachineUA(bcc);
-        stateMachineUA(flag2);
+        llRead(fd,receive);
+        stateMachineUA(receive[0]);
     }
     message_sent=1;
     printf("UA message received from Receiver.\n");

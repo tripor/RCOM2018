@@ -2,9 +2,9 @@
 #include "macros.h"
 #include "shared.h"
 
-void sendData(unsigned int *data,int length,int fd);
-void readData(int fd,unsigned int *guardar);
-void writeStuff(unsigned int data,int fd);
+void sendData(char *data2,int length2,int fd);
+void readData(int fd,char *guardar2);
+void writeStuff(char data,int fd);
 void touch2();
-unsigned int unStuff(unsigned int first,unsigned int second);
-void sendDataAux(unsigned int *data,int length,int fd);
+char unStuff(char first,char second);
+void sendDataAux(char *data,int length,int fd);

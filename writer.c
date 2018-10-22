@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 
   makeConnectionSender(fd);
 
-  unsigned int mandar[10]={1,2,3,4,5,6,7,8,9,10};
+  char mandar[10]={1,2,3,4,5,6,7,8,9,10};
   sendData(mandar,10,fd);
   sendData(mandar,10,fd);
   printf("Disconnecting...\n");
