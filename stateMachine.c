@@ -174,7 +174,7 @@ void stateMachineDisc2(unsigned char message)
                 disconnect_state = 0;
             break;
         case 2:
-            if(message == Cua)
+            if(message == Cdisc)
                 disconnect_state = 3;
             else if (message == FLAG)
                 disconnect_state = 1;
@@ -182,7 +182,7 @@ void stateMachineDisc2(unsigned char message)
                 disconnect_state = 0;
             break;
         case 3:
-            if(message == (Aemi^Cua))
+            if(message == (Aemi^Cdisc))
                 disconnect_state = 4;
             else if (message == FLAG)
                 disconnect_state = 1;
@@ -214,7 +214,7 @@ void stateMachineUaDisc(unsigned char message)
                 disconnect_state = 0;
             break;
         case 2:
-            if(message == Cdisc)
+            if(message == Cua)
                 disconnect_state = 3;
             else if (message == FLAG)
                 disconnect_state = 1;
@@ -222,7 +222,7 @@ void stateMachineUaDisc(unsigned char message)
                 disconnect_state = 0;
             break;
         case 3:
-            if(message == (Aemi^Cdisc))
+            if(message == (Aemi^Cua))
                 disconnect_state = 4;
             else if (message == FLAG)
                 disconnect_state = 1;

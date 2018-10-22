@@ -7,9 +7,6 @@ int count_disconnect=0;
 int message_sent_sender=0;
 int message_sent_receiver=0;
 
-void stateMachineReceive1(unsigned int message);
-void stateMachineSender(unsigned int message);
-void stateMachineReceive2(unsigned int message);
 
 /**
  * Signal alarm handler no caso de timeout do Sender
@@ -75,7 +72,6 @@ void disconnectSender(int fd)
           continue;
         }
         stateMachineDisc(receive[0]);
-        if(getStateDisc()!=5) printf("Got the wrong message. Retrying...\n");
     }
     printf("Received the DISC message from Receiver. Sending UA message.\n");
     message_sent_sender=1;
@@ -89,7 +85,7 @@ void disconnectReceiver(int fd)
     disconnect_fd=fd;
     count_disconnect=0;
     message_sent_receiver=0;
-
+    printf("Waiting for DISC message from Sender...\n");
     //Receber a mensagem de disconnect do Emissor
     while(getStateDisc()!=5){
         unsigned char *receive=malloc(2);
