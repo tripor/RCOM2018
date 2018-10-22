@@ -89,7 +89,7 @@ void llClose(int fd)
 
 void sendMessage(char *type,char * typeSender,int fd)
 {
-  char send[2],a,c;
+  unsigned char send[2],a,c;
   send[1]='\0';
   if(strcmp("W",typeSender)==0) a=Aemi;
   else a=Arec;

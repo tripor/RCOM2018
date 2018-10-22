@@ -127,7 +127,6 @@ void sendData(char *data2,int length2,int fd)
 			turnAlarm(0);
 			continue;
 		}
-		printf("ccc: %c\n",receive[0]);
     changestate2Write(receive[0]);
   }
 	printf("Data sent.\n");
@@ -226,7 +225,7 @@ void readData(int fd,char *guardar2)
 		sendMessage("RR0","R",fd);
   else
 		sendMessage("RR1","R",fd);
-	printf("RR message sent.\n");
+	printf("RR message sent. \n");
 }
 
 void changestate2Read(char message,char bcc)
