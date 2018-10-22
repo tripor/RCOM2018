@@ -1,6 +1,18 @@
 #include "shared.h"
+#include "connect.h"
 
 struct termios *oldtio,*newtio;
+int alarm_state=0;
+
+void turnAlarm(int state)
+{
+  alarm_state=state;
+}
+
+int getAlarm()
+{
+  return alarm_state;
+}
 
 
 int llWrite(int fd, char * buffer, int length)
@@ -17,6 +29,10 @@ int llRead(int fd, char * buffer)
   while (1)
 	{
    	read(fd,&ler,1);
+    if(alarm_state==1)
+    {
+      return -1;
+    }
     if (ler=='\0' && i>=1 )
       break;
 		buf[i]=ler;

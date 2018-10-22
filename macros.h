@@ -16,6 +16,7 @@
 #define ESCAPEF 0x5e
 #define ESCAPEE 0x5d
 #define MaximumRead 10000
+#define WAITTIME 3
 
 //Application layer
 #define DataC 0x01

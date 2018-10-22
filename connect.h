@@ -3,3 +3,5 @@
 
 void makeConnectionReceiver(int fd);
 void makeConnectionSender(int fd);
+
+void touchConnectSender();

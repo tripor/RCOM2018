@@ -21,7 +21,7 @@ void touchConnectSender()
         printf("Resending SET message to Receiver...\n");
         sendMessage("SET","W",connect_fd);
         printf("SET message resent...\n");
-        alarm(3);
+        turnAlarm(1);
     }
 }
 
@@ -46,17 +46,21 @@ void makeConnectionSender(int fd)
 {
     connect_fd=fd;
     connect_count=0;
-    printf("Alarm signal subscribed.\n");
-    signal(SIGALRM, touchConnectSender);
     //Mandar mensagem de SET
     printf("Sending SET message to Receiver...\n");
     sendMessage("SET","W",fd);
     printf("SET message sent to Receiver. Waiting for response...\n");
     //Esperar pela resposta do recetor
     while(getStateUa()!=5){
+        signal(SIGALRM, touchConnectSender);
         char *receive=malloc(2);
         alarm(3);
         llRead(fd,receive);
+        if(getAlarm()==1)
+        {
+          turnAlarm(0);
+          continue;
+        }
         stateMachineUA(receive[0]);
     }
     message_sent=1;

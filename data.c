@@ -10,19 +10,24 @@ int count2=1;
 int program_fd2=0;
 char *data;
 int length;
+int data_message_sent=0;
 void touch2()
 {
-	printf("alarme # %d\n", count2);
-  count2++;
-  if(count2>=4)
-  {
-    printf("Couldn't make connection. Exiting...\n");
-    llClose(program_fd2);
-    exit(1);
-  }
-
-  sendDataAux(data,length,program_fd2);
-  alarm(3);
+	if(data_message_sent==0)
+	{
+		printf("Timeout number %d in Data message response. Resending data...\n", count2);
+	  count2++;
+	  if(count2>=4)
+	  {
+	    printf("Couldn't send data. Exiting...\n");
+	    llClose(program_fd2);
+	    exit(1);
+	  }
+		printf("Resending Data to Receiver...\n");
+	  sendDataAux(data,length,program_fd2);
+		printf("Data sent to Receiver...\n");
+		turnAlarm(1);
+	}
 }
 
 void writeStuff(char data,int fd)
@@ -107,16 +112,21 @@ void sendDataAux(char *data,int length,int fd)
 void sendData(char *data2,int length2,int fd)
 {
 	printf("Alarm signal subscribed.\n");
-  signal(SIGALRM, touch2);
   sendDataAux(data2,length2,fd);
   program_fd2=fd;
   data=data2;
   length=length2;
 	printf("Data sent. Waiting for the response...\n");
   while(state2!=5){
+  	signal(SIGALRM, touch2);
     char *receive=malloc(2);
     alarm(3);
     llRead(fd,receive);
+		if(getAlarm()==1)
+		{
+			turnAlarm(0);
+			continue;
+		}
     changestate2Write(receive[0]);
   }
   if(s==0)s=1;
