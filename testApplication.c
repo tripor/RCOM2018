@@ -2,7 +2,7 @@
 
 //Peço desde já desculpa pelo esparguete, mas acho que nos sítios em que esteja mal dê para perceber bem a ideia
 
-void applicationSend(char fd, char* path){
+void applicationSend(unsigned char fd, unsigned char* path){
 
 
 
@@ -16,21 +16,33 @@ void applicationSend(char fd, char* path){
     int size;
     fseek(file,0,2);
     size = ftell(file);
-    char *filename = basename(path);
+    unsigned char *filename = basename(path);
 
 
     sendControlPackage(fd, size, filename, 0); //start
 
     //FAZER O WHILE E O SPLIT MESSAGE
+    unsigned int* trama[] = malloc(size);
+
+    for(unsigned int i = 0; i < ; i++)
+    {
+
+    }
+
+    
     sendControlPackage(fd, size, filename, 1);//end
 
     return;
 }
 
+void dataSplitting(){
+
+}
+
 void sendDataPackage(int size, int filePacket, int fd){ //a rever...
 
-    unsigned char* data_package = (unsigned char*) malloc(size + 4);
-    unsigned char buffer;
+    unsigned unsigned char* data_package = (unsigned unsigned char*) malloc(size + 4);
+    unsigned unsigned char buffer;
     unsigned int l2 = size/256;
     unsigned int l1 = size%256;
 
@@ -48,11 +60,11 @@ void sendDataPackage(int size, int filePacket, int fd){ //a rever...
     return;
 }
 
-void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
+void sendControlPackage(int fd, int size, unsigned char* filename, int startOrEnd){
 
 
 
-    char * stringSize;
+    unsigned char * stringSize;
     unsigned int typeSize = 0;
     unsigned int typeName = 1;
     unsigned int lengthName = strlen(filename);
@@ -100,7 +112,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 
 }
 
-void receiveData(char* path, int fd){
+void receiveData(unsigned char* path, int fd){
 
   STOP=FALSE;
   unsigned int* fullMessage[100];
@@ -112,7 +124,7 @@ void receiveData(char* path, int fd){
   unsigned int length;
   unsigned int lengthCounter = 0;
   unsigned int fileSize;
-  char fileName;
+  unsigned char fileName;
   unsigned int ctrlPackageSize;
 
   //Data Package
@@ -143,7 +155,7 @@ void receiveData(char* path, int fd){
   {
     value[lengthCounter] = fullMessage[2 + lengthCounter]
     lengthCounter++;
-  }
+  } 
   fileSize = value;
 
 
@@ -203,6 +215,8 @@ void receiveData(char* path, int fd){
     }
 
     return;
+
+    
 
 
 }
