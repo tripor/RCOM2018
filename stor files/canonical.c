@@ -16,11 +16,11 @@ included by <termios.h> */
 
 volatile int STOP=FALSE;
 
-int main(int argc, char** argv)
+int main(int argc, unsigned char** argv)
 {
     int fd,c, res;
     struct termios oldtio,newtio;
-    char buf[255];
+    unsigned char buf[255];
     int i;
     
     if ( (argc < 2) || 
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
               automatically by software by the driver. 
     CS8     : 8n1 (8bit,no parity,1 stopbit)
     CLOCAL  : local connection, no modem control
-    CREAD   : enable receiving characters
+    CREAD   : enable receiving unsigned characters
   */
    newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
 
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
    newtio.c_lflag = ICANON;
 
   /*
-    initialize all control characters
+    initialize all control unsigned characters
     default values can be found in /usr/include/termios.h, and are given
     in the comments, but we don't need them here
   */
@@ -81,8 +81,8 @@ int main(int argc, char** argv)
    newtio.c_cc[VERASE]   = 0;     /* del */
    newtio.c_cc[VKILL]    = 0;     /* @ */
    newtio.c_cc[VEOF]     = 4;     /* Ctrl-d */
-   newtio.c_cc[VTIME]    = 0;     /* inter-character timer unused */
-   newtio.c_cc[VMIN]     = 1;     /* blocking read until 1 character arrives */
+   newtio.c_cc[VTIME]    = 0;     /* inter-unsigned character timer unused */
+   newtio.c_cc[VMIN]     = 1;     /* blocking read until 1 unsigned character arrives */
    newtio.c_cc[VSWTC]    = 0;     /* '\0' */
    newtio.c_cc[VSTART]   = 0;     /* Ctrl-q */
    newtio.c_cc[VSTOP]    = 0;     /* Ctrl-s */
@@ -112,11 +112,11 @@ int main(int argc, char** argv)
   
   
    while (STOP==FALSE) {     /* loop until we have a terminating condition */
-   /* read blocks program execution until a line terminating character is
-      input, even if more than 255 chars are input. If the number
-      of characters read is smaller than the number of chars available,
-      subsequent reads will return the remaining chars. res will be set
-      to the actual number of characters actually read */
+   /* read blocks program execution until a line terminating unsigned character is
+      input, even if more than 255 unsigned chars are input. If the number
+      of unsigned characters read is smaller than the number of unsigned chars available,
+      subsequent reads will return the remaining unsigned chars. res will be set
+      to the actual number of unsigned characters actually read */
       
       res = read(fd,buf,255);
       buf[res]='\0';             /* set end of string, so we can printf */

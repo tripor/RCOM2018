@@ -15,16 +15,16 @@ int getAlarm()
 }
 
 
-int llWrite(int fd, char * buffer, int length)
+int llWrite(int fd, unsigned char * buffer, int length)
 {
   int res=write(fd,buffer,length);
   printf("Bytes send: %d Text: %x\n",res,buffer[0]);
   return res;
 }
 
-int llRead(int fd, char * buffer)
+int llRead(int fd, unsigned char * buffer)
 {
-  char ler,buf[255]="";
+  unsigned char ler,buf[255]="";
 	int i=0;
   while (1)
 	{
@@ -43,7 +43,7 @@ int llRead(int fd, char * buffer)
 }
 
 
-int llOpen(char *canal)
+int llOpen(unsigned char *canal)
 {
   int fd;
 
@@ -87,9 +87,9 @@ void llClose(int fd)
 }
 
 
-void sendMessage(char *type,char * typeSender,int fd)
+void sendMessage(unsigned char *type,unsigned char * typeSender,int fd)
 {
-  unsigned char send[2],a,c;
+  unsigned unsigned char send[2],a,c;
   send[1]='\0';
   if(strcmp("W",typeSender)==0) a=Aemi;
   else a=Arec;

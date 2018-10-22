@@ -32,7 +32,7 @@ void makeConnectionReceiver(int fd)
     //esperar pela mensagem de set do emissor
     printf("Waiting for the SET message from Sender...\n");
     while(getStateSet()!=5){
-      char *receive=malloc(2);
+      unsigned char *receive=malloc(2);
       llRead(fd,receive);
       stateMachineSET(receive[0]);
     }
@@ -53,7 +53,7 @@ void makeConnectionSender(int fd)
     //Esperar pela resposta do recetor
     while(getStateUa()!=5){
         signal(SIGALRM, touchConnectSender);
-        char *receive=malloc(2);
+        unsigned char *receive=malloc(2);
         alarm(3);
         llRead(fd,receive);
         if(getAlarm()==1)

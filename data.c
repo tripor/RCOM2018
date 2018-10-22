@@ -1,14 +1,14 @@
 #include "data.h"
 
-void changestate2Read(char message,char bcc);
-void changestate2Write(char message);
+void changestate2Read(unsigned char message,unsigned char bcc);
+void changestate2Write(unsigned char message);
 
 int s=0;
 int state2=0;
 
 int count2=1;
 int program_fd2=0;
-char *data;
+unsigned char *data;
 int length;
 int data_message_sent=0;
 void touch2()
@@ -30,9 +30,9 @@ void touch2()
 	}
 }
 
-void writeStuff(char data,int fd)
+void writeStuff(unsigned char data,int fd)
 {
-  char send[2];
+  unsigned char send[2];
 	send[1]='\0';
   if(data==FLAG)
   {
@@ -56,7 +56,7 @@ void writeStuff(char data,int fd)
   }
 }
 
-char unStuff(char first,char second)
+unsigned char unStuff(unsigned char first,unsigned char second)
 {
   if(first==ESCAPE && second == ESCAPEF)
   {
@@ -70,10 +70,10 @@ char unStuff(char first,char second)
     return 0x00;
 }
 
-void sendDataAux(char *data,int length,int fd)
+void sendDataAux(unsigned char *data,int length,int fd)
 {
-  char bcc=0;
-  char send[2];
+  unsigned char bcc=0;
+  unsigned char send[2];
 	send[1]='\0';
   bcc^=Aemi;
   if(s==0)
@@ -109,7 +109,7 @@ void sendDataAux(char *data,int length,int fd)
   llWrite(fd,send,2);
 }
 
-void sendData(char *data2,int length2,int fd)
+void sendData(unsigned char *data2,int length2,int fd)
 {
 	data_message_sent=0;
   sendDataAux(data2,length2,fd);
@@ -119,7 +119,7 @@ void sendData(char *data2,int length2,int fd)
 	printf("Data sent. Waiting for the response...\n");
   while(state2!=5){
   	signal(SIGALRM, touch2);
-    char *receive=malloc(2);
+    unsigned char *receive=malloc(2);
     alarm(3);
     llRead(fd,receive);
 		if(getAlarm()==1)
@@ -136,11 +136,11 @@ void sendData(char *data2,int length2,int fd)
 }
 
 
-void readData(int fd,char *guardar2)
+void readData(int fd,unsigned char *guardar2)
 {
   unsigned int bcc=0,i=0,confirmar=0;
-  char *receive=malloc(2);
-  char guardar[1000];
+  unsigned char *receive=malloc(2);
+  unsigned char guardar[1000];
 	printf("Reading data...\n");
   while(state2!=6){
     confirmar=0;
@@ -228,7 +228,7 @@ void readData(int fd,char *guardar2)
 	printf("RR message sent. \n");
 }
 
-void changestate2Read(char message,char bcc)
+void changestate2Read(unsigned char message,unsigned char bcc)
 {
     switch(state2){
       case 0:
@@ -284,7 +284,7 @@ void changestate2Read(char message,char bcc)
       default: state2 = 0;
     }
 }
-void changestate2Write(char message)
+void changestate2Write(unsigned char message)
 {
   switch(state2){
     case 0:

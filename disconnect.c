@@ -66,7 +66,7 @@ void disconnectSender(int fd)
     printf("Mensage DISC sent to Receiver.Waiting response...\n");
     //Receber a mensagem de disconnect do Receiver
     while(getStateDisc()!=5){
-        char *receive=malloc(2);
+        unsigned char *receive=malloc(2);
         alarm(3);
         llRead(fd,receive);
         stateMachineDisc(receive[0]);
@@ -88,7 +88,7 @@ void disconnectReceiver(int fd)
 
     //Receber a mensagem de disconnect do Emissor
     while(getStateDisc()!=5){
-        char *receive=malloc(2);
+        unsigned char *receive=malloc(2);
         llRead(fd,receive);
         stateMachineDisc2(receive[0]);
         if(getStateDisc()!=5) printf("Got the wrong message. Retrying...\n");
@@ -99,7 +99,7 @@ void disconnectReceiver(int fd)
     printf("DISC message sent to Sender. Waiting response...\n");
     resetStates();
     while(getStateDisc()!=5){
-        char *receive=malloc(2);
+        unsigned char *receive=malloc(2);
         alarm(3);
         llRead(fd,receive);
         stateMachineUaDisc(receive[0]);

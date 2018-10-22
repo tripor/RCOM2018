@@ -6,8 +6,8 @@ int getStateDisc();
 
 void resetStates();
 
-void stateMachineSET(char message);
-void stateMachineUA(char message);
-void stateMachineDisc(char message);
-void stateMachineDisc2(char message);
-void stateMachineUaDisc(char message);
+void stateMachineSET(unsigned char message);
+void stateMachineUA(unsigned char message);
+void stateMachineDisc(unsigned char message);
+void stateMachineDisc2(unsigned char message);
+void stateMachineUaDisc(unsigned char message);

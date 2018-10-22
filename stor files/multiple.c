@@ -6,7 +6,7 @@
 #include <fcntl.h>
 
 
-int open_input_source(char *);
+int open_input_source(unsigned char *);
 void handle_input_from_source(int); 
 int MAX(int, int);
 
@@ -42,7 +42,7 @@ main()
 }
 
 
-int open_input_source(char * port)
+int open_input_source(unsigned char * port)
 {
     int fd = 0;
     
@@ -59,7 +59,7 @@ int open_input_source(char * port)
 void handle_input_from_source(int fd)
 {
     int res = 0, i;
-    char buf[255];
+    unsigned char buf[255];
   
     res = read(fd,buf,255);
     buf[res]=0;

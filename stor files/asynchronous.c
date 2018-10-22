@@ -18,12 +18,12 @@ volatile int STOP=FALSE;
 void signal_handler_IO (int status);   /* definition of signal handler */
 int wait_flag=TRUE;                    /* TRUE while no signal received */
 
-int main(int argc, char** argv)
+int main(int argc, unsigned char** argv)
 {
     int fd,c, res;
     struct termios oldtio,newtio;
     struct sigaction saio;           /* definition of signal action */
-    char buf[255];
+    unsigned char buf[255];
     int i;
 
     //Uses either COM1 or COM2     
@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 
 /***************************************************************************
 * signal handler. sets wait_flag to FALSE, to indicate above loop that     *
-* characters have been received.                                           *
+* unsigned characters have been received.                                           *
 ***************************************************************************/
 
 void signal_handler_IO (int status)

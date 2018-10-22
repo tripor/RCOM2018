@@ -27,7 +27,7 @@ void resetStates()
   disconnect_state=0;
 }
 //
-void stateMachineSET(char message)
+void stateMachineSET(unsigned char message)
 {
 
     switch(state_set){
@@ -75,7 +75,7 @@ void stateMachineSET(char message)
 
 }
 //
-void stateMachineUA(char message)
+void stateMachineUA(unsigned char message)
 {
    switch(state_ua){
         case 0:
@@ -120,7 +120,7 @@ void stateMachineUA(char message)
 }
 
 //
-void stateMachineDisc(char message)
+void stateMachineDisc(unsigned char message)
 {
     switch(disconnect_state){
         case 0:
@@ -160,7 +160,7 @@ void stateMachineDisc(char message)
     }
 }
 
-void stateMachineDisc2(char message)
+void stateMachineDisc2(unsigned char message)
 {
     switch(disconnect_state){
         case 0:
@@ -200,7 +200,7 @@ void stateMachineDisc2(char message)
     }
 }
 
-void stateMachineUaDisc(char message)
+void stateMachineUaDisc(unsigned char message)
 {
     switch(disconnect_state){
         case 0:
