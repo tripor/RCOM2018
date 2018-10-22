@@ -3,6 +3,7 @@
 #include "stateMachine.h"
 #include "data.h"
 #include "connect.h"
+#include "disconnect.h"
 
 int main(int argc, char** argv)
 {

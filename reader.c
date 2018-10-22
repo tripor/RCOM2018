@@ -3,6 +3,7 @@
 #include "stateMachine.h"
 #include "data.h"
 #include "connect.h"
+#include "disconnect.h"
 
 int main(int argc, char** argv)
 {
@@ -17,7 +18,7 @@ int main(int argc, char** argv)
   makeConnectionReceiver(fd);
   unsigned int guardar[100];
   readData(fd,guardar);
-  for(int i=0;i<10;i++)
+  for(int i=0;i<9;i++)
   {
     printf("valor: %x\n",guardar[i]);
   }
