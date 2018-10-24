@@ -4,10 +4,11 @@
 #include "data.h"
 #include "connect.h"
 #include "disconnect.h"
+#include "testApplication.h"
 
 int main(int argc, char** argv)
 {
-  if ( (argc != 2) || ((strcmp("/dev/ttyS0", argv[1])!=0) && (strcmp("/dev/ttyS1", argv[1])!=0) ))
+  if ( (argc != 3) || ((strcmp("/dev/ttyS0", argv[1])!=0) && (strcmp("/dev/ttyS1", argv[1])!=0) ))
   {
     printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS0\n");
     exit(1);
@@ -17,15 +18,7 @@ int main(int argc, char** argv)
 
   makeConnectionReceiver(fd);
 
-  
-  unsigned char guardar[100];
-  guardar[0]=70;
-  readData(fd,guardar);
-  for(int i=0;i<10;i++)
-  {
-    printf("valor: %x\n",guardar[i]);
-  }
-
+  receiveData(argv[2], fd);
 
 
   printf("Disconnecting...\n");

@@ -1,9 +1,6 @@
 #include "testApplication.h"
 
-//Peço desde já desculpa pelo esparguete, mas acho que nos sítios em que esteja mal dê para perceber bem a ideia
-
-void applicationSend(unsigned char fd, char* path){
-
+void applicationSend(int fd, char* path){
 
 
     FILE * file;
@@ -16,28 +13,44 @@ void applicationSend(unsigned char fd, char* path){
     int size;
     fseek(file,0,2);
     size = ftell(file);
+
     char *filename = basename(path);
 
+   sendControlPackage(fd, size, filename, 0); //start
 
-    sendControlPackage(fd, size, filename, 0); //start
+    
+   /* int packetAmount = 0;
+   
+    unsigned char *fileSplitting = malloc(size);
 
-    //FAZER O WHILE E O SPLIT MESSAGE
-  //  unsigned int* trama[] = malloc(size);
+ 
+    while(!feof(file)) {
+        fscanf(file, "%c", &fileSplitting[packetAmount]);
+        packetAmount++;
+    }
+    
+    char packet = NULL;
 
+     
 
+    for(unsigned int i = 0; i < packetAmount; i++)
+   { 
+      memcpy(packet, &fileSplitting[i], sizeof(char));
+      sendDataPackage(size, packet,fd);
+   }
 
-    sendControlPackage(fd, size, filename, 1);//end
+   
+    sendControlPackage(fd, size, filename, 1);//end*/
+
+    fclose(file);
 
     return;
 }
 
-void dataSplitting(){
 
-}
+void sendDataPackage(int size, char filePacket, int fd){ //a rever...
 
-void sendDataPackage(int size, int filePacket, int fd){ //a rever...
-
-    unsigned char* data_package = (char*) malloc(size + 4);
+    /*unsigned char* data_package = (char*) malloc(size + 4);
     unsigned char buffer;
     unsigned int l2 = size/256;
     unsigned int l1 = size%256;
@@ -48,7 +61,7 @@ void sendDataPackage(int size, int filePacket, int fd){ //a rever...
     data_package[3] = l1;
     memcpy(data_package, filePacket, size);
 
-    sendData((unsigned char)data_package, size, fd);
+    sendData((unsigned char)data_package, size, fd);*/
     return;
 }
 
@@ -56,54 +69,52 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 
 
 
-    char * stringSize;
+    char  stringSize[255];
+
+
     unsigned int typeSize = 0;
-    unsigned int typeName = 1;
-    unsigned int lengthName = strlen(filename);
     sprintf(stringSize, "%d", size);
     unsigned int lengthSize = strlen(stringSize);
-    unsigned int valueSize = size;
 
-    int packageSize = 5 + lengthName + lengthSize; //C + TLV1 + TLV2
-    char ctrl_package[packageSize];
+    unsigned int typeName = 1;
+    unsigned int lengthName = strlen(filename);
+
+
+
+
+    //Tamanho do pacote de controlo
+    int packageSize = 1 + 1 + 1 + lengthSize + 1 + 1 +lengthName; //C + TLV1 + TLV2
+
+
+    unsigned char *ctrl_package = malloc(sizeof(unsigned char)*packageSize);
 
 
       if(startOrEnd == 0)//start
-      ctrl_package[0] = StartC;
+        ctrl_package[0] = StartC;
       else if(startOrEnd == 1)//end
-      ctrl_package[0] = EndC;
+        ctrl_package[0] = EndC;
       else return;
 
-      ctrl_package[1] = typeSize;
-      ctrl_package[2] = lengthSize;
-      //antes em baixo era (por exemplo) (valueSize >> 24)&& 0xff para só ficarem oito bits, mas achei que assim também dava
-      ctrl_package[3] = (valueSize >> 24)%255;
-      ctrl_package[4] = (valueSize >> 16)%255;
-      ctrl_package[5] = (valueSize >> 8)%255;
-      ctrl_package[6] = valueSize%255;
+      int i=0;
 
-      ctrl_package[7] = typeName;
-      ctrl_package[8] = lengthName;
-
-      unsigned int lengthNameConstant = lengthName;
-      unsigned int x = 0;
-
-      while(lengthName > 0)
+      ctrl_package[i] = typeSize;
+      i++;
+      ctrl_package[i] = lengthSize;
+      i++;
+      
+      for(int k=lengthSize-1;k>=0;k--,i++)
       {
-        x = lengthNameConstant - lengthName;
-
-        ctrl_package[x+9] = filename[x];
-        lengthName--;
+        ctrl_package[i]=stringSize[k];
       }
 
-      unsigned int lengthSizeConstant = lengthSize;
-      unsigned int y = 0;
-      while(lengthSize > 0)
-      {
-        x = lengthSizeConstant - lengthSize;
+      ctrl_package[i] = typeName;
+      i++;
+      ctrl_package[i] = lengthName;
+      i++;
 
-      //  ctrl_package[x+y+9] = size[y];
-        lengthSize--;
+      for(int k=lengthName-1;k>=0;k--,i++)
+      {
+        ctrl_package[i]=filename[k];
       }
 
 
@@ -114,10 +125,10 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 }
 
 void receiveData(char* path, int fd){
-
-    int STOP=FALSE;
+/*
+    //int STOP=FALSE;
   unsigned char fullMessage[100];
-  unsigned int thisByte;
+  //unsigned int thisByte;
 
   //Control Package
   unsigned int CData;
@@ -130,7 +141,7 @@ void receiveData(char* path, int fd){
 
   //Data Package
   unsigned int Cbyte;
-  unsigned int Nread[2];
+  unsigned int Nread;
   unsigned int l2;
   unsigned int l1;
   unsigned int k; // l2 * 256 + l1;
@@ -184,37 +195,20 @@ void receiveData(char* path, int fd){
   if(CData != Cbyte)
     printf("ERROR: Received data is wrong, doesn't start with the data package, current value %x", Cbyte);
 
-  Nread[0] = fullMessage[ctrlPackageSize + 2];
-  Nread[1] = fullMessage[ctrlPackageSize + 3];
+  Nread = fullMessage[ctrlPackageSize + 2];
   if(Nread != 255)
     printf("ERROR: Received data is wrong,parsed N value is not 255, current value %x", Nread);
 
-  l2 = fullMessage[ctrlPackageSize + 4];
-  l1 = fullMessage[ctrlPackageSize + 5];
+  l2 = fullMessage[ctrlPackageSize + 3];
+  l1 = fullMessage[ctrlPackageSize + 4];
   k = l2 * 256 + l1;
   unsigned int data_content[k];
 
   while(dataCounter < k){
-    data_content[k] = fullMessage[ctrlPackageSize + 5 + dataCounter];
+    data_content[k] = fullMessage[ctrlPackageSize + 4 + dataCounter];
     dataCounter++;
   }
-/*
-  //Leitura control package END
-  unsigned int tmpPackage1, tmpPackage2;
-
-  tmpPackage1 = fullMessage >> (ctrlPackageSize + 5 + dataCounter);
-  tmpPackage2 = fullMessage%(ctrlPackageSize + 5 + dataCounter);
-
-  tmpPackage1 = (tmpPackage1 >> 1);
-
-  if(tmpPackage2[0] == EndC)
-    printf("ERROR: Received data is wrong, doesn't start with the correct control package, current value: %x", tmpPackage2[0]);
-
-    tmpPackage2 = (tmpPackage2 >> 1);
-
-    if(tmpPackage2 != tmpPackage1){
-    printf("ERROR: Control packages don't matcH");
-  }*/
+*/
 
     return;
 
@@ -222,3 +216,7 @@ void receiveData(char* path, int fd){
 
 
 }
+
+
+
+

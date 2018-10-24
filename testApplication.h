@@ -1,7 +1,7 @@
 #include "includes.h"
 #include "data.h"
 
-void applicationSend(unsigned char fd, char* path);
-void sendDataPackage(int size, int filePacket, int fd);
+void applicationSend(int fd, char* path);
+void sendDataPackage(int size, char filePacket, int fd);
 void sendControlPackage(int fd, int size,  char* path, int startOrEnd);
-void receiveData( char* path,int size);
+void receiveData( char* path,int fd);
