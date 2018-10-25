@@ -1,69 +1,79 @@
 #include "testApplication.h"
 
+int app_stage=2;
+int file_size;
+char my_filename[255];
+
+
+void sendDataPackage(char *text, int fd,int seq){
+
+  unsigned char * mandar=malloc(1+1+1+1+PackageSize);
+  int i=0;
+  mandar[i]=DataC;
+  i++;
+  mandar[i]=seq;
+  i++;
+  unsigned char L2=strlen(text)/256;
+  unsigned char L1=strlen(text)%256;
+  mandar[i]=L2;
+  i++;
+  mandar[i]=L1;
+  i++;
+  for(int j=0;i<strlen(text)+4;i++,j++)
+  {
+    mandar[i]=text[j];
+  }
+  sendData(mandar, PackageSize+4, fd);
+  return;
+}
+
+
 void applicationSend(int fd, char* path){
 
 
-    FILE * file;
-    file = fopen(path, "rb");
-    if(file == NULL)
-    {
-      perror("\n ERROR: File didn't open. \n");
-      return;
-    }
-    int size;
-    fseek(file,0,2);
-    size = ftell(file);
-
-    char *filename = basename(path);
-
-   sendControlPackage(fd, size, filename, 0); //start
-
-    
-   /* int packetAmount = 0;
-   
-    unsigned char *fileSplitting = malloc(size);
-
- 
-    while(!feof(file)) {
-        fscanf(file, "%c", &fileSplitting[packetAmount]);
-        packetAmount++;
-    }
-    
-    char packet = NULL;
-
-     
-
-    for(unsigned int i = 0; i < packetAmount; i++)
-   { 
-      memcpy(packet, &fileSplitting[i], sizeof(char));
-      sendDataPackage(size, packet,fd);
-   }
-
-   
-    sendControlPackage(fd, size, filename, 1);//end*/
-
-    fclose(file);
-
+  FILE * file;
+  file = fopen(path, "rb");
+  if(file == NULL)
+  {
+    perror("\n ERROR: File didn't open. \n");
     return;
+  }
+  int size;
+  fseek(file,0,2);
+  size = ftell(file);
+
+  char *filename = basename(path);
+
+  sendControlPackage(fd, size, filename, StartC); //start
+
+  
+  
+  char *fileText = calloc(size,sizeof(char));
+
+  char ch;
+  int i=0;
+  while((ch = fgetc(file)) != EOF)
+  {
+    fileText[i]=ch;
+    i++;
+  }
+    
+  char *text=calloc(PackageSize+1,sizeof(char));
+  int j=1;
+  for(i=0;i<sizeof(char)*size;i+=sizeof(char)*PackageSize,j++)
+  {
+    fileText+=i;
+    memcpy(text,fileText,sizeof(char)*PackageSize);
+    sendDataPackage(text,fd,j);
+  }  
+
+  sendControlPackage(fd, size, filename, EndC);
+
+  fclose(file);
+
+  return;
 }
 
-
-void sendDataPackage(int size, char filePacket, int fd){ //a rever...
-
-    /*unsigned char* data_package = (char*) malloc(size + 4);
-    unsigned char buffer;
-    unsigned int l2 = size/256;
-    unsigned int l1 = size%256;
-
-    data_package[0] = DataC;
-    data_package[1] = SequenceN;
-    data_package[2] = l2;
-    data_package[3] = l1;
-    memcpy(data_package, filePacket, size);
-
-    sendData((unsigned char)data_package, size, fd);*/
-    return;
-}
 
 void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 
@@ -83,138 +93,125 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 
 
     //Tamanho do pacote de controlo
-    int packageSize = 1 + 1 + 1 + lengthSize + 1 + 1 +lengthName; //C + TLV1 + TLV2
+    int pacoteSize = 1 + 1 + 1 + lengthSize + 1 + 1 +lengthName; //C + TLV1 + TLV2
 
 
-    unsigned char *ctrl_package = malloc(sizeof(unsigned char)*packageSize);
+    unsigned char *ctrl_package = malloc(sizeof(unsigned char)*pacoteSize);
 
 
-      if(startOrEnd == 0)//start
-        ctrl_package[0] = StartC;
-      else if(startOrEnd == 1)//end
-        ctrl_package[0] = EndC;
-      else return;
+    ctrl_package[0] = startOrEnd;
 
-      int i=0;
+    int i=0;
 
-      ctrl_package[i] = typeSize;
-      i++;
-      ctrl_package[i] = lengthSize;
-      i++;
-      
-      for(int k=lengthSize-1;k>=0;k--,i++)
-      {
-        ctrl_package[i]=stringSize[k];
-      }
+    ctrl_package[i] = typeSize;
+    i++;
+    ctrl_package[i] = lengthSize;
+    i++;
+    
+    for(int k=lengthSize-1;k>=0;k--,i++)
+    {
+      ctrl_package[i]=stringSize[k];
+    }
 
-      ctrl_package[i] = typeName;
-      i++;
-      ctrl_package[i] = lengthName;
-      i++;
+    ctrl_package[i] = typeName;
+    i++;
+    ctrl_package[i] = lengthName;
+    i++;
 
-      for(int k=lengthName-1;k>=0;k--,i++)
-      {
-        ctrl_package[i]=filename[k];
-      }
+    for(int k=lengthName-1;k>=0;k--,i++)
+    {
+      ctrl_package[i]=filename[k];
+    }
 
 
-    sendData(ctrl_package, packageSize, fd);
+    sendData(ctrl_package, pacoteSize, fd);
     return;
 
 
 }
 
-void receiveData(char* path, int fd){
-/*
-    //int STOP=FALSE;
-  unsigned char fullMessage[100];
-  //unsigned int thisByte;
-
-  //Control Package
-  unsigned int CData;
-  unsigned int type;
-  unsigned int length;
-  unsigned int lengthCounter = 0;
-  unsigned int fileSize;
-  unsigned char fileName;
-  unsigned int ctrlPackageSize;
-
-  //Data Package
-  unsigned int Cbyte;
-  unsigned int Nread;
-  unsigned int l2;
-  unsigned int l1;
-  unsigned int k; // l2 * 256 + l1;
-  unsigned int dataCounter = 0;
-
-
-  readData(fd,fullMessage);
-
-
-//Leitura control package START
-  CData = fullMessage[0];
-  if(CData != StartC)
-    printf("ERROR: Received data is wrong, doesn't start with the correct control package, current value: %x", CData);
-
-  type = fullMessage[1]; //Ver FileSize
-  if(type != 0)
-    printf("ERROR: Received data is wrong, doesn't have the correct type value for the information sent (0), current value: %x", type);
-
-  length = fullMessage[2];
-  unsigned int value[length];
-
-  while(lengthCounter < length)
+void receiveDataRead(int fd)
+{
+  int total=0;
+  unsigned char *text= malloc(sizeof(unsigned char)*file_size);
+  while(total!=PackageSize)
   {
-    value[lengthCounter] = fullMessage[2 + lengthCounter];
-    lengthCounter++;
+    unsigned char *lido=malloc(sizeof(unsigned char)*(PackageSize+5));
+    readData(fd,lido);
+    int i=2;
+    int L2=lido[i];
+    i++;
+    int L1=lido[i];
+    i++;
+    int numeroDeOctetos=L2*256+L1;
+    for(int j=i;j<numeroDeOctetos+4;j++,total++)
+    {
+      text[total]=lido[j];
+    }
+    free(lido);
   }
-  fileSize = value;
-
-
-
-  type = fullMessage[3 + lengthCounter]; //Ver fileName
-  if(type != 1)
-    printf("ERROR: Received data is wrong, doesn't have the correct type value for the information sent (1), current value: %x", type);
-
-  length = fullMessage[4 + lengthCounter];
-
-  lengthCounter = 0;
-  while(lengthCounter < length)
+  int file=open(my_filename,O_CREAT | O_WRONLY,0600);
+  for(int i=0;i<PackageSize;i++)
   {
-    value[lengthCounter] = fullMessage[2 + lengthCounter];
-    lengthCounter++;
+    write(file,&(text[i]),1);
   }
+  close(file);
+}
 
-  fileName = value;
 
-  ctrlPackageSize = length*2 + 5;
 
-  //Leitura Data Package
-  Cbyte = fullMessage[ctrlPackageSize + 1];
-
-  if(CData != Cbyte)
-    printf("ERROR: Received data is wrong, doesn't start with the data package, current value %x", Cbyte);
-
-  Nread = fullMessage[ctrlPackageSize + 2];
-  if(Nread != 255)
-    printf("ERROR: Received data is wrong,parsed N value is not 255, current value %x", Nread);
-
-  l2 = fullMessage[ctrlPackageSize + 3];
-  l1 = fullMessage[ctrlPackageSize + 4];
-  k = l2 * 256 + l1;
-  unsigned int data_content[k];
-
-  while(dataCounter < k){
-    data_content[k] = fullMessage[ctrlPackageSize + 4 + dataCounter];
-    dataCounter++;
+void receiveControlPackage(int fd, int startOrEnd)
+{
+  unsigned char *message=calloc(255,sizeof(unsigned char));
+  char takeOff[255];
+  readData(fd,message);
+  int i=0;
+  if(message[i]==startOrEnd)
+  {
+    app_stage=startOrEnd;
   }
-*/
+  i++;
+  int sizeOcteto=0;
+  do
+  {
+    if(message[i]==0)
+    {
+      i++;
+      sizeOcteto=message[i];
+      i++;
+      int j=0;
+      for(;sizeOcteto>0;i++,sizeOcteto--,j++)
+      {
+        takeOff[j]=message[i];
+      }
+      takeOff[j]='\0';
+      sscanf(takeOff,"%d",&file_size);
+    }
+    else if(message[i]==1)
+    {
+      i++;
+      sizeOcteto=message[i];
+      i++;
+      int j=0;
+      for(;sizeOcteto>0;i++,sizeOcteto--,j++)
+      {
+        takeOff[j]=message[i];
+      }
+      takeOff[j]='\0';
+      sscanf(takeOff,"%s",my_filename);
+    }
+  }while(message[i]!=0);
+  printf("Filename: %s Size: %d \n",my_filename,file_size);
+}
 
-    return;
+void receiveData(int fd){
 
+  receiveControlPackage(fd,StartC);
 
-
-
+  receiveDataRead(fd);
+  
+  receiveControlPackage(fd,EndC);
+  return;
 }
 
 

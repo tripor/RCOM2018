@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 
   makeConnectionReceiver(fd);
 
-  receiveData(argv[2], fd);
+  receiveData(fd);
 
 
   printf("Disconnecting...\n");

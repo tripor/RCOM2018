@@ -22,7 +22,7 @@
 #define DataC 0x01
 #define StartC  0x02
 #define EndC  0x03
-#define SequenceN 255
+#define PackageSize 128
 
 #define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
