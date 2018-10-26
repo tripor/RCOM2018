@@ -150,7 +150,7 @@ void receiveDataRead(int fd)
     }
     free(lido);
   }
-  int file=open(my_filename,O_CREAT | O_WRONLY,0600);
+  int file=open(my_filename,O_CREAT | O_WRONLY | O_TRUNC,0600);
   for(int i=0;i<PackageSize;i++)
   {
     write(file,&(text[i]),1);
