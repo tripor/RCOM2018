@@ -5,7 +5,7 @@ int file_size;
 char my_filename[255];
 
 
-void sendDataPackage(char *text, int fd,int seq){
+void sendDataPackage(unsigned char *text, int fd,int seq,int leng){
 
   unsigned char * mandar=malloc(1+1+1+1+PackageSize);
   int i=0;
@@ -13,17 +13,19 @@ void sendDataPackage(char *text, int fd,int seq){
   i++;
   mandar[i]=seq;
   i++;
-  unsigned char L2=strlen(text)/256;
-  unsigned char L1=strlen(text)%256;
+  unsigned char L2=leng/256;
+  unsigned char L1=leng%256;
   mandar[i]=L2;
   i++;
   mandar[i]=L1;
   i++;
-  for(int j=0;i<strlen(text)+4;i++,j++)
+  printf("L2:%d L1:%d\n",L2,L1);
+  for(int j=0;i<leng+4;i++,j++)
   {
-    mandar[i]=text[j];
+    mandar[i]=text[j]+128;
   }
   sendData(mandar, PackageSize+4, fd);
+  free(mandar);
   return;
 }
 
@@ -41,32 +43,41 @@ void applicationSend(int fd, char* path){
   int size;
   fseek(file,0,2);
   size = ftell(file);
-
+  rewind(file);
   char *filename = basename(path);
 
   sendControlPackage(fd, size, filename, StartC); //start
   printf("Control package start sent.\n");
 
-
   char *fileText = calloc(size,sizeof(char));
-
-  char ch;
-  int i=0;
-  while(!feof(file))
+  int ch;
+  unsigned long long int i=0;
+  while((ch = fgetc(file)) != EOF)
   {
-    fgets(*ch,1,file);
     fileText[i]=ch;
     i++;
-  }
 
-  char *text=calloc(PackageSize+1,sizeof(char));
-  int j=1;
-  for(i=0;i<sizeof(char)*size;i+=sizeof(char)*PackageSize,j++)
-  {
-    fileText+=i;
-    memcpy(text,fileText,sizeof(char)*PackageSize);
-    sendDataPackage(text,fd,j);
   }
+  printf("I:%llu\n",i);
+  unsigned char *text=calloc(PackageSize+1,sizeof(unsigned char));
+  int j=1;
+  for(i=0;i<(sizeof(char)*size);i+=sizeof(char)*PackageSize,j++)
+  {
+    printf("%llu\n",i);
+    for(int k=0;k<sizeof(char)*PackageSize;k++)
+    {
+      text[k]=(*fileText)+128;
+      fileText+=sizeof(char);
+    }
+    sendDataPackage(text,fd,j,sizeof(char)*PackageSize);
+  }
+  for(int k=0;k<size-(i-sizeof(char)*PackageSize);k++)
+  {
+    text[k]=(*fileText)+128;
+    fileText+=sizeof(char);
+  }
+  sendDataPackage(text,fd,j,size-(i-sizeof(char)*PackageSize));
+  printf("%llu\n",i);
   printf("All data sent.\n");
 
   sendControlPackage(fd, size, filename, EndC);
@@ -135,10 +146,10 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 
 void receiveDataRead(int fd)
 {
-  int total=0;
+  unsigned long long int total=0;
   unsigned char *text= malloc(sizeof(unsigned char)*file_size);
   unsigned char *lido=malloc(sizeof(unsigned char)*(PackageSize+10));
-  while(total!=PackageSize)
+  while(total<file_size)
   {
     readData(fd,lido);
     int i=2;
@@ -146,15 +157,14 @@ void receiveDataRead(int fd)
     i++;
     int L1=lido[i];
     i++;
-    printf("L:%d %d\n\n",L2,L1);
     int numeroDeOctetos=L2*256+L1;
     for(int j=i;j<numeroDeOctetos+4;j++,total++)
     {
-      text[total]=lido[j];
+      text[total]=lido[j]-128;
     }
   }
   int file=open(my_filename,O_CREAT | O_WRONLY | O_TRUNC,0600);
-  for(int i=0;i<PackageSize;i++)
+  for(unsigned long long int i=0;i<file_size-1;i++)
   {
     write(file,&(text[i]),1);
   }

@@ -26,5 +26,6 @@ int main(int argc, char** argv)
 
   printf("Disconnecting...\n");
   disconnectSender(fd);
+
   return 0;
 }
