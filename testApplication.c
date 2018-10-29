@@ -46,8 +46,8 @@ void applicationSend(int fd, char* path){
 
   sendControlPackage(fd, size, filename, StartC); //start
   printf("Control package start sent.\n");
-  
-  
+
+
   char *fileText = calloc(size,sizeof(char));
 
   char ch;
@@ -57,7 +57,7 @@ void applicationSend(int fd, char* path){
     fileText[i]=ch;
     i++;
   }
-    
+
   char *text=calloc(PackageSize+1,sizeof(char));
   int j=1;
   for(i=0;i<sizeof(char)*size;i+=sizeof(char)*PackageSize,j++)
@@ -65,13 +65,13 @@ void applicationSend(int fd, char* path){
     fileText+=i;
     memcpy(text,fileText,sizeof(char)*PackageSize);
     sendDataPackage(text,fd,j);
-  }  
+  }
   printf("All data sent.\n");
 
   sendControlPackage(fd, size, filename, EndC);
   printf("Control package end sent.\n");
 
-  fclose(file); 
+  fclose(file);
 
   return;
 }
@@ -103,13 +103,13 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 
     ctrl_package[0] = startOrEnd;
 
-    int i=0;
+    int i=1;
 
     ctrl_package[i] = typeSize;
     i++;
     ctrl_package[i] = lengthSize;
     i++;
-    
+
     for(int k=lengthSize-1;k>=0;k--,i++)
     {
       ctrl_package[i]=stringSize[k];
@@ -125,7 +125,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
       ctrl_package[i]=filename[k];
     }
 
-
+    printf("Sending Control.\n");
     sendData(ctrl_package, pacoteSize, fd);
     return;
 
@@ -174,6 +174,7 @@ void receiveControlPackage(int fd, int startOrEnd)
   }
   i++;
   int sizeOcteto=0;
+  printf("%d\n",message[0]);
   do
   {
     if(message[i]==0)
@@ -216,7 +217,3 @@ void receiveData(int fd){
   printf("Received control package end.\n");
   return;
 }
-
-
-
-
