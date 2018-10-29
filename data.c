@@ -143,12 +143,14 @@ void readData(int fd,unsigned char *guardar2)
   unsigned char receive[2];
   unsigned char guardar[1000];
   state2=0;
+	int error=0;
 	printf("Reading data...\n");
   while(state2!=6){
     confirmar=0;
     bcc=0;
     i=0;
     int k=0;
+		error=0;
     llRead(fd,receive);
     changestate2Read(receive[0],0);
     if(state2!=0)
@@ -156,10 +158,16 @@ void readData(int fd,unsigned char *guardar2)
       receive[0]=0;
       while(receive[0]!=FLAG && i<=MaximumRead)
       {
-        llRead(fd,receive);
+        error=llRead(fd,receive);
+				if(error>=3)break;
         guardar[i]=receive[0];
         i++;
       }
+			if(error>=3){
+				state2=0;
+				continue;
+			}
+
       if(i>MaximumRead) continue;
       i=i-3;
       bcc^=guardar[0];//A

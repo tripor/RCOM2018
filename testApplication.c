@@ -19,10 +19,10 @@ void sendDataPackage(unsigned char *text, int fd,int seq,int leng){
   i++;
   mandar[i]=L1;
   i++;
-  printf("L2:%d L1:%d\n",L2,L1);
+  printf("L2:%d L1:%d\n",L2,mandar[i-1]);
   for(int j=0;i<leng+4;i++,j++)
   {
-    mandar[i]=text[j]+128;
+    mandar[i]=text[j];
   }
   sendData(mandar, PackageSize+4, fd);
   free(mandar);
@@ -49,7 +49,7 @@ void applicationSend(int fd, char* path){
   sendControlPackage(fd, size, filename, StartC); //start
   printf("Control package start sent.\n");
 
-  char *fileText = calloc(size,sizeof(char));
+  unsigned char *fileText = calloc(size,sizeof(unsigned char));
   int ch;
   unsigned long long int i=0;
   while((ch = fgetc(file)) != EOF)
@@ -58,28 +58,25 @@ void applicationSend(int fd, char* path){
     i++;
 
   }
-  printf("I:%llu\n",i);
   unsigned char *text=calloc(PackageSize+1,sizeof(unsigned char));
   int j=1;
-  for(i=0;i<(sizeof(char)*size);i+=sizeof(char)*PackageSize,j++)
+  for(i=0;i<(sizeof(char)*size)-PackageSize;i+=sizeof(char)*PackageSize,j++)
   {
-    printf("%llu\n",i);
     for(int k=0;k<sizeof(char)*PackageSize;k++)
     {
-      text[k]=(*fileText)+128;
+      text[k]=(*fileText);
       fileText+=sizeof(char);
     }
     sendDataPackage(text,fd,j,sizeof(char)*PackageSize);
   }
+  i+=PackageSize;
   for(int k=0;k<size-(i-sizeof(char)*PackageSize);k++)
   {
-    text[k]=(*fileText)+128;
+    text[k]=(*fileText);
     fileText+=sizeof(char);
   }
   sendDataPackage(text,fd,j,size-(i-sizeof(char)*PackageSize));
-  printf("%llu\n",i);
   printf("All data sent.\n");
-
   sendControlPackage(fd, size, filename, EndC);
   printf("Control package end sent.\n");
 
@@ -147,7 +144,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
 void receiveDataRead(int fd)
 {
   unsigned long long int total=0;
-  unsigned char *text= malloc(sizeof(unsigned char)*file_size);
+  unsigned char *text= malloc(sizeof(unsigned char)*(file_size+1));
   unsigned char *lido=malloc(sizeof(unsigned char)*(PackageSize+10));
   while(total<file_size)
   {
@@ -158,19 +155,17 @@ void receiveDataRead(int fd)
     int L1=lido[i];
     i++;
     int numeroDeOctetos=L2*256+L1;
-    for(int j=i;j<numeroDeOctetos+4;j++,total++)
+    for(int j=i;j<numeroDeOctetos+4 && total<file_size;j++,total++)
     {
-      text[total]=lido[j]-128;
+      text[total]=lido[j];
     }
   }
   int file=open(my_filename,O_CREAT | O_WRONLY | O_TRUNC,0600);
-  for(unsigned long long int i=0;i<file_size-1;i++)
+  for(unsigned long long int i=0;i<file_size;i++)
   {
     write(file,&(text[i]),1);
   }
   close(file);
-  free(lido);
-  free(text);
 }
 
 
