@@ -140,7 +140,7 @@ void sendData(unsigned char *data2,int length2,int fd)
 void readData(int fd,unsigned char *guardar2)
 {
   unsigned int bcc=0,i=0,confirmar=0;
-  unsigned char *receive=malloc(2);
+  unsigned char receive[2];
   unsigned char guardar[1000];
   state2=0;
 	printf("Reading data...\n");

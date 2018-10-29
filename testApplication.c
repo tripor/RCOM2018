@@ -52,8 +52,9 @@ void applicationSend(int fd, char* path){
 
   char ch;
   int i=0;
-  while((ch = fgetc(file)) != EOF)
+  while(!feof(file))
   {
+    fgets(*ch,1,file);
     fileText[i]=ch;
     i++;
   }
@@ -110,7 +111,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
     ctrl_package[i] = lengthSize;
     i++;
 
-    for(int k=lengthSize-1;k>=0;k--,i++)
+    for(int k=0;k<lengthSize;k++,i++)
     {
       ctrl_package[i]=stringSize[k];
     }
@@ -120,7 +121,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
     ctrl_package[i] = lengthName;
     i++;
 
-    for(int k=lengthName-1;k>=0;k--,i++)
+    for(int k=0;k<lengthName;k++,i++)
     {
       ctrl_package[i]=filename[k];
     }
@@ -136,21 +137,21 @@ void receiveDataRead(int fd)
 {
   int total=0;
   unsigned char *text= malloc(sizeof(unsigned char)*file_size);
+  unsigned char *lido=malloc(sizeof(unsigned char)*(PackageSize+10));
   while(total!=PackageSize)
   {
-    unsigned char *lido=malloc(sizeof(unsigned char)*(PackageSize+5));
     readData(fd,lido);
     int i=2;
     int L2=lido[i];
     i++;
     int L1=lido[i];
     i++;
+    printf("L:%d %d\n\n",L2,L1);
     int numeroDeOctetos=L2*256+L1;
     for(int j=i;j<numeroDeOctetos+4;j++,total++)
     {
       text[total]=lido[j];
     }
-    free(lido);
   }
   int file=open(my_filename,O_CREAT | O_WRONLY | O_TRUNC,0600);
   for(int i=0;i<PackageSize;i++)
@@ -158,6 +159,8 @@ void receiveDataRead(int fd)
     write(file,&(text[i]),1);
   }
   close(file);
+  free(lido);
+  free(text);
 }
 
 
