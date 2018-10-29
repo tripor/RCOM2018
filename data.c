@@ -112,6 +112,7 @@ void sendDataAux(unsigned char *data,int length,int fd)
 void sendData(unsigned char *data2,int length2,int fd)
 {
 	data_message_sent=0;
+  state2=0;
   sendDataAux(data2,length2,fd);
   program_fd2=fd;
   data=data2;
@@ -129,7 +130,7 @@ void sendData(unsigned char *data2,int length2,int fd)
 		}
     changestate2Write(receive[0]);
   }
-	printf("Data sent.\n");
+	printf("Response received.\n");
 	data_message_sent=1;
   if(s==0)s=1;
   else s=0;
@@ -141,6 +142,7 @@ void readData(int fd,unsigned char *guardar2)
   unsigned int bcc=0,i=0,confirmar=0;
   unsigned char *receive=malloc(2);
   unsigned char guardar[1000];
+  state2=0;
 	printf("Reading data...\n");
   while(state2!=6){
     confirmar=0;

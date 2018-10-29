@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 
   int fd=llOpen(argv[1]);
 
-  //makeConnectionSender(fd);
+  makeConnectionSender(fd);
 
 
   applicationSend(fd,argv[2]);
@@ -25,6 +25,6 @@ int main(int argc, char** argv)
 
 
   printf("Disconnecting...\n");
-  //disconnectSender(fd);
+  disconnectSender(fd);
   return 0;
 }

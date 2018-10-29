@@ -45,7 +45,7 @@ void applicationSend(int fd, char* path){
   char *filename = basename(path);
 
   sendControlPackage(fd, size, filename, StartC); //start
-
+  printf("Control package start sent.\n");
   
   
   char *fileText = calloc(size,sizeof(char));
@@ -66,10 +66,12 @@ void applicationSend(int fd, char* path){
     memcpy(text,fileText,sizeof(char)*PackageSize);
     sendDataPackage(text,fd,j);
   }  
+  printf("All data sent.\n");
 
   sendControlPackage(fd, size, filename, EndC);
+  printf("Control package end sent.\n");
 
-  fclose(file);
+  fclose(file); 
 
   return;
 }
@@ -207,10 +209,11 @@ void receiveControlPackage(int fd, int startOrEnd)
 void receiveData(int fd){
 
   receiveControlPackage(fd,StartC);
-
+  printf("Received control package start.\n");
   receiveDataRead(fd);
-  
+  printf("All data received.\n");
   receiveControlPackage(fd,EndC);
+  printf("Received control package end.\n");
   return;
 }
 

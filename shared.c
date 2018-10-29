@@ -18,7 +18,7 @@ int getAlarm()
 int llWrite(int fd, unsigned char * buffer, int length)
 {
   int res=write(fd,buffer,length);
-  printf("Bytes send: %d Text: %x\n",res,buffer[0]);
+  //printf("Bytes send: %d Text: %x\n",res,buffer[0]);
   return res;
 }
 
