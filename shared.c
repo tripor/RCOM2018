@@ -97,7 +97,7 @@ void sendMessage(char *type,char * typeSender,int fd)
   else if(strcmp("RR1",type)==0) c=Crr1;
   else if(strcmp("RR0",type)==0) c=Crr0;
   else if(strcmp("REJ1",type)==0) c=Crej1;
-  else if(strcmp("REJ2",type)==0) c=Crej0;
+  else if(strcmp("REJ0",type)==0) c=Crej0;
 
   send[0]=FLAG;
   llWrite(fd,send,2);
