@@ -152,6 +152,7 @@ void readData(int fd,unsigned char *guardar2)
     int k=0;
 		error=0;
     llRead(fd,receive);
+		printf("received:%x\n",receive[0]);
     changestate2Read(receive[0],0);
     if(state2!=0)
     {
