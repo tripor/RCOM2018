@@ -19,7 +19,7 @@ void touch2()
 	{
 		printf("Timeout number %d in Data message response. Resending data...\n", count2);
 	  count2++;
-	  if(count2>=6)
+	  if(count2>=7)
 	  {
 	    printf("Couldn't send data. Exiting...\n");
 	    llClose(program_fd2);
@@ -136,7 +136,7 @@ void sendData(unsigned char *data2,int length2,int fd)
     if(state3==5)
     {
       printf("Error in sending message ...\n");
-      sleep(0.5);
+      sleep(0.8);
       printf("Recending data...\n");
       sendDataAux(data,length,program_fd2);
       printf("Data resent.\n");
@@ -160,9 +160,18 @@ void readData(int fd,unsigned char *guardar2)
   unsigned char guardar[1000];
   state2=0;
 	int error=0;
+  int soma=0;
   int passei=0;
 	printf("Reading data...\n");
   while(state2!=6){
+    if(soma>2){
+      printf("Data read. Sending RR message to Sender...\n");
+      if(s==0)
+        sendMessage("RR1","R",fd);
+      else
+        sendMessage("RR0","R",fd);
+      printf("RR message sent. \n");
+    }
     confirmar=0;
     bcc=0;
     i=0;
@@ -173,6 +182,7 @@ void readData(int fd,unsigned char *guardar2)
     passei++;
     if(state2!=0)
     {
+      printf("S:%d\n",s);
       if(passei!=1)
       {
         passei=0;
@@ -189,13 +199,15 @@ void readData(int fd,unsigned char *guardar2)
       }
 			if(error>=3 || i<4){
 				printf("Error Reading...\n");
+        soma++;
 				state2=0;
 				printf("Sending REJ message to Sender...\n");
 	      if(s==0)
-					sendMessage("REJ0","R",fd);
-	      else
 					sendMessage("REJ1","R",fd);
-				printf("REJ message sent.\n");
+	      else
+					sendMessage("REJ0","R",fd);
+				printf("REJ message sent. S: %d\n",s);
+        sleep(1);
 				continue;
 			}
 
@@ -249,17 +261,21 @@ void readData(int fd,unsigned char *guardar2)
       if(state2!=6)
       {
         printf("Sending REJ message to Sender...\n");
+        soma++;
         if(s==0)
-          sendMessage("REJ0","R",fd);
-        else
           sendMessage("REJ1","R",fd);
-        printf("REJ message sent.\n");
+        else
+          sendMessage("REJ0","R",fd);
+        printf("REJ message sent. S:%d\n",s);
         state2=0;
+        sleep(1);
       }
 
     }
     
   }
+  if(s)s=0;
+  else s=1;
 	printf("Data read. Sending RR message to Sender...\n");
   if(s==0)
 		sendMessage("RR0","R",fd);
@@ -286,12 +302,10 @@ void changestate2Read(unsigned char message,unsigned char bcc)
       case 2:
       if(message == S0 && s==0)
       {
-        s=1;
         state2 = 3;
       }
       else if(message == S1 && s==1)
       {
-        s=0;
         state2 = 3;
       }
       else if (message == FLAG)
@@ -386,11 +400,11 @@ void changestate2WriteREJ(unsigned char message)
     break;
 
     case 2:
-    if(message == Crej1 && s==1)
+    if(message == Crej0 && s==1)
     {
       state3 = 3;
     }
-    else if(message == Crej0 && s==0)
+    else if(message == Crej1 && s==0)
     {
       state3 = 3;
     }
@@ -400,7 +414,7 @@ void changestate2WriteREJ(unsigned char message)
         state3 = 0;
     break;
     case 3:
-    if((message == (Arec^Crej1) && s==1) || (message == (Arec^Crej0) && s==0) )
+    if((message == (Arec^Crej0) && s==1) || (message == (Arec^Crej1) && s==0) )
         state3 = 4;
     else if (message == FLAG)
         state3 = 1;
