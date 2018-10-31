@@ -151,6 +151,7 @@ void readData(int fd,unsigned char *guardar2)
     i=0;
     int k=0;
 		error=0;
+		printf("ola %d\n",state2);
     llRead(fd,receive);
 		printf("received:%x\n",receive[0]);
     changestate2Read(receive[0],0);
@@ -165,7 +166,14 @@ void readData(int fd,unsigned char *guardar2)
         i++;
       }
 			if(error>=3){
+				printf("Error Reading...\n");
 				state2=0;
+				printf("Sending REJ message to Sender...\n");
+	      if(s==0)
+					sendMessage("REJ0","R",fd);
+	      else
+					sendMessage("REJ1","R",fd);
+				printf("REJ message sent.\n");
 				continue;
 			}
 
