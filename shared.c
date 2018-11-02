@@ -27,7 +27,9 @@ int llRead(int fd, unsigned char * buffer)
 	int i=0;
   while (1)
 	{
+    printf("aqui\n");
    	read(fd,&ler,1);
+    printf("aqui2\n");
     if(alarm_state==1)
     {
       return -1;
