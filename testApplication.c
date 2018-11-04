@@ -1,4 +1,5 @@
 #include "testApplication.h"
+#include "data.h"
 
 int app_stage=2;
 int file_size;
@@ -24,7 +25,7 @@ void sendDataPackage(unsigned char *text, int fd,int seq,int leng){
   {
     mandar[i]=text[j];
   }
-  sendData(mandar, PackageSize+4, fd);
+  llwrite(fd,mandar, PackageSize+4);
   free(mandar);
   return;
 }
@@ -135,7 +136,7 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
     }
 
     printf("Sending Control.\n");
-    sendData(ctrl_package, pacoteSize, fd);
+    llwrite(fd,ctrl_package, pacoteSize);
     return;
 
 
@@ -148,7 +149,7 @@ void receiveDataRead(int fd)
   unsigned char *lido=malloc(sizeof(unsigned char)*(PackageSize+10));
   while(total<file_size)
   {
-    readData(fd,lido);
+    llRead(fd,lido);
     int i=2;
     int L2=lido[i];
     i++;
@@ -174,7 +175,7 @@ void receiveControlPackage(int fd, int startOrEnd)
 {
   unsigned char *message=calloc(255,sizeof(unsigned char));
   char takeOff[255];
-  readData(fd,message);
+  llRead(fd,message);
   int i=0;
   if(message[i]==startOrEnd)
   {

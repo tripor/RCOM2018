@@ -2,95 +2,34 @@
 #include "connect.h"
 
 struct termios *oldtio,*newtio;
-int alarm_state=0;
+int myType;
 
-void turnAlarm(int state)
+void setRead()
 {
-  alarm_state=state;
+  myType=1;
 }
 
-int getAlarm()
+void setWrite()
 {
-  return alarm_state;
+  myType=0;
 }
 
-
-int llWrite(int fd, unsigned char * buffer, int length)
+int getType()
 {
-  int res=write(fd,buffer,length);
+  return myType;
+}
+
+/**
+ * Escreve um byte
+ */
+int writeByte(int fd,unsigned char byte)
+{
+  int res=write(fd,&byte,1);
   return res;
 }
-
-int llRead(int fd, unsigned char * buffer)
-{
-  unsigned char ler;
-	int i=0;
-  while (1)
-	{
-    printf("aqui\n");
-   	read(fd,&ler,1);
-    printf("aqui2\n");
-    if(alarm_state==1)
-    {
-      return -1;
-    }
-    if (ler=='\0' && i>=1 )
-      break;
-		buffer[i]=ler;
-		i++;
-  }
-  return i;
-}
-
-
-int llOpen( char *canal)
-{
-  int fd;
-
-  oldtio=(struct termios *)malloc(sizeof(struct termios));
-  newtio=(struct termios *)malloc(sizeof(struct termios));
-  // Open port to read
-  fd = open(canal, O_RDWR | O_NOCTTY );
-
-  if (fd <0) {perror(canal); exit(-1); }
-
-  if ( tcgetattr(fd,oldtio) == -1) { /* save current port settings */
-    perror("tcgetattr");
-    exit(-1);
-  }
-  bzero(newtio, sizeof(*newtio));
-  (*newtio).c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
-  (*newtio).c_iflag = IGNPAR;
-  (*newtio).c_oflag = 0;
-
-  /* set input mode (non-canonical, no echo,...) */
-  (*newtio).c_lflag = 0;
-
-  (*newtio).c_cc[VTIME]    = 1;
-  (*newtio).c_cc[VMIN]     = 1;
-  tcflush(fd, TCIOFLUSH);
-
-  if ( tcsetattr(fd,TCSANOW,newtio) == -1) {
-    perror("tcsetattr");
-    exit(-1);
-  }
-
-  printf("New termios structure set\n");
-  return fd;
-}
-
-int llClose(int fd)
-{
-	sleep(2);
-  tcsetattr(fd,TCSANOW,oldtio);
-  return close(fd);
-}
-
-
 void sendMessage(char *type,char * typeSender,int fd)
 {
-  unsigned char send[2],a,c;
-  send[1]='\0';
+  unsigned char send,a,c;
   if(strcmp("W",typeSender)==0) a=Aemi;
   else a=Arec;
   if(strcmp("SET",type)==0) c=Cset;
@@ -101,18 +40,18 @@ void sendMessage(char *type,char * typeSender,int fd)
   else if(strcmp("REJ1",type)==0) c=Crej1;
   else if(strcmp("REJ0",type)==0) c=Crej0;
 
-  send[0]=FLAG;
-  llWrite(fd,send,2);
+  send=FLAG;
+  writeByte(fd,send);
 
-  send[0]=a;
-  llWrite(fd,send,2);
+  send=a;
+  writeByte(fd,send);
 
-  send[0]=c;
-  llWrite(fd,send,2);
+  send=c;
+  writeByte(fd,send);
 
-  send[0]=a^c;
-  llWrite(fd,send,2);
+  send=a^c;
+  writeByte(fd,send);
 
-  send[0]=FLAG;
-  llWrite(fd,send,2);
+  send=FLAG;
+  writeByte(fd,send);
 }

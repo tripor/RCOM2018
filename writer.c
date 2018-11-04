@@ -13,10 +13,9 @@ int main(int argc, char** argv)
     printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS0\n");
     exit(1);
   }
-
+  setWrite();
   int fd=llOpen(argv[1]);
 
-  makeConnectionSender(fd);
 
 
   applicationSend(fd,argv[2]);
@@ -25,7 +24,8 @@ int main(int argc, char** argv)
 
 
   printf("Disconnecting...\n");
-  disconnectSender(fd);
+  
+  llClose(fd);
 
   return 0;
 }

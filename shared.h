@@ -1,13 +1,14 @@
 #include "includes.h"
 #include "macros.h"
 
-int llWrite(int fd, unsigned char * buffer, int length);
-int llRead(int fd, unsigned char * buffer);
+void setRead();
+void setWrite();
+/**
+ * 0-write 1-read
+ */
+int getType();
 
-int getAlarm();
-void turnAlarm(int state);
+int writeByte(int fd,unsigned char byte);
 
 void sendMessage( char *type, char * typeSender,int fd);
 
-int llOpen();
-int llClose(int fd);
