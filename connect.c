@@ -91,7 +91,7 @@ int llOpen( char *canal)
   /* set input mode (non-canonical, no echo,...) */
   (*newtio).c_lflag = 0;
 
-  (*newtio).c_cc[VTIME]    = 10;
+  (*newtio).c_cc[VTIME]    = 8;
   (*newtio).c_cc[VMIN]     = 1;
   tcflush(fd, TCIOFLUSH);
 

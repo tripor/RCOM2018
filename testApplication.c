@@ -6,7 +6,7 @@ int file_size;
 char my_filename[255];
 
 
-void sendDataPackage(unsigned char *text, int fd,int seq,int leng){
+void sendData(unsigned char *text, int fd,int seq,int leng){
 
   unsigned char * mandar=malloc(1+1+1+1+PackageSize);
   int i=0;
@@ -47,8 +47,8 @@ void applicationSend(int fd, char* path){
   rewind(file);
   char *filename = basename(path);
 
-  sendControlPackage(fd, size, filename, StartC); //start
-  printf("Control package start sent.\n");
+  sendControl(fd, size, filename, StartC); //start
+  printf("Control Tram start sent.\n");
 
   unsigned char *fileText = calloc(size,sizeof(unsigned char));
   int ch;
@@ -68,7 +68,7 @@ void applicationSend(int fd, char* path){
       text[k]=(*fileText);
       fileText+=sizeof(char);
     }
-    sendDataPackage(text,fd,j,sizeof(char)*PackageSize);
+    sendData(text,fd,j,sizeof(char)*PackageSize);
   }
   i+=PackageSize;
   for(int k=0;k<size-(i-sizeof(char)*PackageSize);k++)
@@ -76,10 +76,10 @@ void applicationSend(int fd, char* path){
     text[k]=(*fileText);
     fileText+=sizeof(char);
   }
-  sendDataPackage(text,fd,j,size-(i-sizeof(char)*PackageSize));
+  sendData(text,fd,j,size-(i-sizeof(char)*PackageSize));
   printf("All data sent.\n");
-  sendControlPackage(fd, size, filename, EndC);
-  printf("Control package end sent.\n");
+  sendControl(fd, size, filename, EndC);
+  printf("Control Tram end sent.\n");
 
   fclose(file);
 
@@ -87,7 +87,7 @@ void applicationSend(int fd, char* path){
 }
 
 
-void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
+void sendControl(int fd, int size, char* filename, int startOrEnd){
 
 
 
@@ -108,35 +108,35 @@ void sendControlPackage(int fd, int size, char* filename, int startOrEnd){
     int pacoteSize = 1 + 1 + 1 + lengthSize + 1 + 1 +lengthName; //C + TLV1 + TLV2
 
 
-    unsigned char *ctrl_package = malloc(sizeof(unsigned char)*pacoteSize);
+    unsigned char *ctrl_Tram = malloc(sizeof(unsigned char)*pacoteSize);
 
 
-    ctrl_package[0] = startOrEnd;
+    ctrl_Tram[0] = startOrEnd;
 
     int i=1;
 
-    ctrl_package[i] = typeSize;
+    ctrl_Tram[i] = typeSize;
     i++;
-    ctrl_package[i] = lengthSize;
+    ctrl_Tram[i] = lengthSize;
     i++;
 
     for(int k=0;k<lengthSize;k++,i++)
     {
-      ctrl_package[i]=stringSize[k];
+      ctrl_Tram[i]=stringSize[k];
     }
 
-    ctrl_package[i] = typeName;
+    ctrl_Tram[i] = typeName;
     i++;
-    ctrl_package[i] = lengthName;
+    ctrl_Tram[i] = lengthName;
     i++;
 
     for(int k=0;k<lengthName;k++,i++)
     {
-      ctrl_package[i]=filename[k];
+      ctrl_Tram[i]=filename[k];
     }
 
     printf("Sending Control.\n");
-    llwrite(fd,ctrl_package, pacoteSize);
+    llwrite(fd,ctrl_Tram, pacoteSize);
     return;
 
 
@@ -171,7 +171,7 @@ void receiveDataRead(int fd)
 
 
 
-void receiveControlPackage(int fd, int startOrEnd)
+void receiveControl(int fd, int startOrEnd)
 {
   unsigned char *message=calloc(255,sizeof(unsigned char));
   char takeOff[255];
@@ -218,11 +218,11 @@ void receiveControlPackage(int fd, int startOrEnd)
 
 void receiveData(int fd){
 
-  receiveControlPackage(fd,StartC);
-  printf("Received control package start.\n");
+  receiveControl(fd,StartC);
+  printf("Received control tram start.\n");
   receiveDataRead(fd);
   printf("All data received.\n");
-  receiveControlPackage(fd,EndC);
-  printf("Received control package end.\n");
+  receiveControl(fd,EndC);
+  printf("Received control tram end.\n");
   return;
 }
