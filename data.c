@@ -13,6 +13,10 @@ int ja_last=0;
 
 int count2 = 1;
 int data_alarm = 0;
+/**
+ * @brief Funcao que trata do alarm quando e recebido este sinal. Esta função é só chamada quando estão a ser transferidos dados
+ * 
+ */
 void touch2()
 {
   data_alarm = 1;
@@ -24,7 +28,13 @@ void touch2()
     exit(1);
   }
 }
-
+/**
+ * @brief Compara um array de unsigned com o ultimo tram recebido. Caso ainda não haja um ultimo tram, este passa a ser esse
+ * 
+ * @param n1 Um array de unsigned chars
+ * @param lenght Tamanho do array
+ * @return int retorna 1 caso seja diferente ou 0 caso seja igual
+ */
 int comparer(unsigned char *n1,int lenght)
 {
   if(ja_last)
@@ -51,7 +61,12 @@ int comparer(unsigned char *n1,int lenght)
   }
 }
 
-
+/**
+ * @brief Recebe um byte de unsigned char e tranforma-o caso seja necessario. Stuffing
+ * 
+ * @param data Byte que vai sofrer stuffing
+ * @param fd Descritor do ficheiro
+ */
 void writeStuff(unsigned char data, int fd)
 {
   unsigned char send;
@@ -75,7 +90,13 @@ void writeStuff(unsigned char data, int fd)
     writeByte(fd, send);
   }
 }
-
+/**
+ * @brief Verifica se um byte sofrer stuffing e retorna este byte
+ * 
+ * @param first Primeiro byte a verificar
+ * @param second Segundo byte a verificar
+ * @return unsigned char Retorna 0 caso não haja stuffing ou diferente caso haja stuffing
+ */
 unsigned char unStuff(unsigned char first, unsigned char second)
 {
   if (first == ESCAPE && second == ESCAPEF)
@@ -89,7 +110,13 @@ unsigned char unStuff(unsigned char first, unsigned char second)
   else
     return 0x00;
 }
-
+/**
+ * @brief Manda a trama com os campos de controlos
+ * 
+ * @param data Informação que eu quero enviar
+ * @param length Tamnho da trama a enviar
+ * @param fd Descritor do ficheiro
+ */
 void sendDataAux(unsigned char *data, int length, int fd)
 {
   unsigned char bcc1 = 0, bcc2 = 0;
@@ -129,7 +156,14 @@ void sendDataAux(unsigned char *data, int length, int fd)
   send = FLAG;
   writeByte(fd, send);
 }
-
+/**
+ * @brief Escreve a trama de informacao no descritor. Espera por uma resposta por parte do recetor. Caso haja timeout ou a mensagem seja mal recebida volta a enviar
+ * 
+ * @param fd Descritor do ficheiro
+ * @param data Informacao que eu pretendo enviar
+ * @param length Comprimento da informacao
+ * @return int Comprimento enviado. Deve ser sempre length, ou o programa termina a meio
+ */
 int llwrite(int fd, unsigned char *data, int length)
 {
   int res;
@@ -181,7 +215,13 @@ int llwrite(int fd, unsigned char *data, int length)
     s = 0;
   return length;
 }
-
+/**
+ * @brief Le informacao. Caso a informacao recebida esteja correta manda um mensagem de retorno de ready, caso contrario manda uma mensagem rej.
+ * 
+ * @param fd Descritor do ficheiro
+ * @param guardar2 Onde eu vou guardar a informacao. Ja deve vir previamente alocada memoria suficiente, do tamanho de Packat size.
+ * @return int Retorna o comprimento da informacao lida
+ */
 int llRead(int fd, unsigned char *guardar2)
 {
   unsigned int bcc = 0, i = 0;
@@ -204,6 +244,7 @@ int llRead(int fd, unsigned char *guardar2)
     passei++;
     if (state2 != 0)
     {
+      //Caso eu esteja a ler o primeiro byte de FLAG varias vezes, vou rejeitar este por ser o FLAG final da trama
       if (passei != 1)
       {
         passei = 0;
@@ -211,6 +252,7 @@ int llRead(int fd, unsigned char *guardar2)
       }
       passei = 0;
       receive = 0;
+      // Receber todos os bytes da trama
       while (receive != FLAG && i <= MaximumRead)
       {
         res = read(fd, &receive, 1);
@@ -219,6 +261,7 @@ int llRead(int fd, unsigned char *guardar2)
         guardar[i] = receive;
         i++;
       }
+      // Caso a trama tenho um tamanho muito pequeno, vai ser descartada
       if (i < 4)
       {
         printf("Error Reading...\n");
@@ -231,14 +274,15 @@ int llRead(int fd, unsigned char *guardar2)
         printf("REJ message sent. S: %d\n", s);
         continue;
       }
-
+      // Caso a trama tenha um tamanho demasiado grande
       if (i > MaximumRead)
         continue;
       i = i - 3;
-      bcc = 0;           //TODO check this bcc1 e bcc2
-      bcc ^= guardar[0]; //A
-      bcc ^= guardar[1]; //C
+      bcc = 0;           
+      bcc ^= guardar[0]; 
+      bcc ^= guardar[1]; 
       int j = 3, help = 0;
+      //Verificar se o bcc não esta stuffed
       if (unStuff(guardar[2], guardar[3]) != 0)
         j++;
       if (unStuff(guardar[i], guardar[i + 1]) != 0)
@@ -248,11 +292,13 @@ int llRead(int fd, unsigned char *guardar2)
       }
       changestate2Read(guardar[0], bcc);
       changestate2Read(guardar[1], bcc);
+      if(state2!=3)continue;
       if (unStuff(guardar[2], guardar[3]) == 0)
         changestate2Read(guardar[2], bcc);
       else
         changestate2Read(unStuff(guardar[2], guardar[3]), bcc);
       bcc = 0;
+      //Guardar a informacao na variavel de parametro
       for (; j <= i; j++, k++)
       {
         unsigned int un = unStuff(guardar[j], guardar[j + 1]);
@@ -277,7 +323,7 @@ int llRead(int fd, unsigned char *guardar2)
         }
       }
 
-
+      // Verificar se a trama recebida não é repetida
       if(comparer(guardar2,k)==0)
       {
         printf("Repeated message. Sending RR...\n");
@@ -289,12 +335,13 @@ int llRead(int fd, unsigned char *guardar2)
         continue;
       }
 
-
+      // Unstuff aos bytes finais
       if (unStuff(guardar[i + help], guardar[i + 1 + help]) == 0)
         changestate2Read(guardar[i + 1 + help], bcc);
       else
         changestate2Read(unStuff(guardar[i + help], guardar[i + 1 + help]), bcc);
       changestate2Read(guardar[i + 2 + help], bcc);
+      // Caso a mensagem recebida esteja errada
       if (state2 != 6)
       {
         printf("Sending REJ message to Sender. Message wrong...\n");
@@ -311,6 +358,7 @@ int llRead(int fd, unsigned char *guardar2)
     s = 0;
   else
     s = 1;
+  // Caso a mensagem recebida esteja correta
   printf("Data read. Sending RR message to Sender...\n");
   if (s == 0)
     sendMessage("RR0", "R", fd);
@@ -319,7 +367,12 @@ int llRead(int fd, unsigned char *guardar2)
   printf("RR message sent. \n");
   return k;
 }
-
+/**
+ * @brief Maquina de estados para o recetor. Caso estado 6, a mensagem recebida esta correta
+ * 
+ * @param message Byte que eu recebi
+ * @param bcc Bcc caso esteja no estado 3 ou 4
+ */
 void changestate2Read(unsigned char message, unsigned char bcc)
 {
   switch (state2)
@@ -377,6 +430,11 @@ void changestate2Read(unsigned char message, unsigned char bcc)
     state2 = 0;
   }
 }
+/**
+ * @brief Maquina de estados para a mensagem RR. Se no estado 5, a mensagem RR foi recebida com sucesso
+ * 
+ * @param message Byte que eu recebi
+ */
 void changestate2Write(unsigned char message)
 {
   switch (state2)
@@ -426,6 +484,11 @@ void changestate2Write(unsigned char message)
     state2 = 0;
   }
 }
+/**
+ * @brief Maquina de estados para a mensagem REJ. Caso estado 5 a mensagem REJ foi recebida com sucesso
+ * 
+ * @param message Byte que eu recebi
+ */
 void changestate2WriteREJ(unsigned char message)
 {
   switch (state3)

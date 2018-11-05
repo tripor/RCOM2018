@@ -5,6 +5,10 @@ struct termios *oldtio,*newtio;
 int connect_count=1;
 int connect_fd=0;
 int connect_alarm=0;
+/**
+ * @brief Funcao que e chamada quando o sinal do relogio e recebido. Só é chamada quando o programa esta a tentar estabelecer a conecao.
+ * 
+ */
 void touchConnectSender()
 {
     connect_alarm=1;
@@ -16,7 +20,11 @@ void touchConnectSender()
         exit(1);
     }
 }
-
+/**
+ * @brief Estabelece a conecao. Deve ser feita por parte do Recetor
+ * 
+ * @param fd Descritor do ficheiro
+ */
 void makeConnectionReceiver(int fd)
 {
     int res;
@@ -35,7 +43,11 @@ void makeConnectionReceiver(int fd)
     sendMessage("UA","R",fd);
     printf("UA message sent to Receiver.\n");
 }
-
+/**
+ * @brief Estabelece a conecao. deve ser feita por parte do Emissor
+ * 
+ * @param fd Descritor do ficheiro
+ */
 void makeConnectionSender(int fd)
 {
     signal(SIGALRM, touchConnectSender);
@@ -68,7 +80,12 @@ void makeConnectionSender(int fd)
     printf("UA message received from Receiver.\n");
 
 }
-
+/**
+ * @brief Abre a conecao entre o emissor e o recetor. É necessario que a funcao setRead ou setWrite seja chamada antes para identificar o tipo.
+ * 
+ * @param canal Path com o canal a usar. Normal é o /dev/ttyS0
+ * @return int Retorna o descrito do ficheiro correspondente ao canal
+ */
 int llOpen( char *canal)
 {
   int fd;
@@ -114,7 +131,11 @@ int llOpen( char *canal)
 
   return fd;
 }
-
+/**
+ * @brief Aplica a estrutura termios antiga. Função auxiliar do llClose
+ * 
+ * @param fd Descritor do ficheiro do canal
+ */
 void closeL(int fd)
 {
   tcsetattr(fd,TCSANOW,oldtio);

@@ -6,7 +6,10 @@
 int count_disconnect=0;
 int disconnect_alarm=0;
 
-
+/**
+ * @brief Funcao chamada quando e recebido o sinal do alarm. Esta funcao só é chamada quando o programa esta a fazer disconnect
+ * 
+ */
 void touchDisconnect()
 {
     disconnect_alarm=1;
@@ -18,6 +21,11 @@ void touchDisconnect()
         exit(1);
     }
 }
+/**
+ * @brief Faz a disconeção por parte do emissor
+ * 
+ * @param fd Descritor do ficheiro
+ */
 void disconnectSender(int fd)
 {
     int res;
@@ -51,7 +59,11 @@ void disconnectSender(int fd)
     sendMessage("UA","W",fd);
     printf("UA message sent\n");
 }
-
+/**
+ * @brief Faz a disconeção por parte do recetor
+ * 
+ * @param fd Descritor do ficheiro
+ */
 void disconnectReceiver(int fd)
 {
     unsigned char receive;
@@ -93,7 +105,12 @@ void disconnectReceiver(int fd)
 
 }
 
-
+/**
+ * @brief Fecha a ligação. Deve ser chamada a função setWrite ou setRead para indicar quem é o emissor ou o recetor
+ * 
+ * @param fd Descrito do ficheiro de canal
+ * @return int Retorna o 0 caso o canal tenha sido fechado com sucesso ou -1 caso contrario
+ */
 int llClose(int fd)
 {
     if(getType())
