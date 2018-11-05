@@ -101,7 +101,7 @@ void applicationSend(int fd, char* path){
   printf("|\n");
   printf("+----------------------------------------------------------------------------------------------------+\n");
   printf("Progress: 100%%\n");
-  printf("Progress: %d/%d\n",file_size,file_size);
+  printf("Progress: %d/%d\n",size,size);
   sendData(text,fd,j,size-(i-sizeof(char)*PackageSize));
   printf("All data sent.\n");
   sendControl(fd, size, filename, EndC);
