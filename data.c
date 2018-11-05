@@ -90,7 +90,7 @@ void sendDataAux(unsigned char *data, int length, int fd)
   writeByte(fd, send);
 
   writeStuff(bcc1, fd);
-  printf("Bcc1:%x\n",bbc1);
+  printf("Bcc1:%x\n",bcc1);
 
   for (int i = 0; i < length; i++)
   {
@@ -98,7 +98,7 @@ void sendDataAux(unsigned char *data, int length, int fd)
   }
 
   writeStuff(bcc2, fd);
-  printf("Bcc2:%x\n",bbc2);
+  printf("Bcc2:%x\n",bcc2);
   send = FLAG;
   writeByte(fd, send);
 }
