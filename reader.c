@@ -13,6 +13,10 @@ int main(int argc, char** argv)
     printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS0\n");
     exit(1);
   }
+
+
+
+
   setRead();
   int fd=llOpen(argv[1]);
 

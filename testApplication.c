@@ -20,7 +20,6 @@ void sendData(unsigned char *text, int fd,int seq,int leng){
   i++;
   mandar[i]=L1;
   i++;
-  printf("L2:%d L1:%d\n",L2,mandar[i-1]);
   for(int j=0;i<leng+4;i++,j++)
   {
     mandar[i]=text[j];
@@ -69,6 +68,23 @@ void applicationSend(int fd, char* path){
       fileText+=sizeof(char);
     }
     sendData(text,fd,j,sizeof(char)*PackageSize);
+    int percent=i*100/PackageSize;
+    clear();
+    printf("+----------------------------------------------------------------------------------------------------+\n|");
+    for(int progresso=0;progresso<100;progresso++)
+    {
+      if(progresso<=percent)
+      {
+        printf("#");
+      }
+      else
+        printf(" ");
+    }
+    printf("|\n");
+    printf("+----------------------------------------------------------------------------------------------------+\n");
+    printf("Progress: %d%%\n",percent);
+    printf("Progress: %llu/%d\n",i,file_size);
+
   }
   i+=PackageSize;
   for(int k=0;k<size-(i-sizeof(char)*PackageSize);k++)
@@ -76,6 +92,16 @@ void applicationSend(int fd, char* path){
     text[k]=(*fileText);
     fileText+=sizeof(char);
   }
+  clear();
+  printf("+----------------------------------------------------------------------------------------------------+\n|");
+  for(int progresso=0;progresso<100;progresso++)
+  {
+      printf("#");
+  }
+  printf("|\n");
+  printf("+----------------------------------------------------------------------------------------------------+\n");
+  printf("Progress: 100%%\n");
+  printf("Progress: %d/%d\n",file_size,file_size);
   sendData(text,fd,j,size-(i-sizeof(char)*PackageSize));
   printf("All data sent.\n");
   sendControl(fd, size, filename, EndC);
@@ -160,6 +186,24 @@ void receiveDataRead(int fd)
     {
       text[total]=lido[j];
     }
+    int percent=total*100/file_size;
+    clear();
+    printf("+----------------------------------------------------------------------------------------------------+\n|");
+    for(int progresso=0;progresso<100;progresso++)
+    {
+      if(progresso<=percent)
+      {
+        printf("#");
+      }
+      else
+        printf(" ");
+    }
+    printf("|\n");
+    printf("+----------------------------------------------------------------------------------------------------+\n");
+    printf("Progress: %d%%\n",percent);
+    printf("Progress: %llu/%d\n",total,file_size);
+
+
   }
   int file=open(my_filename,O_CREAT | O_WRONLY | O_TRUNC,0600);
   for(unsigned long long int i=0;i<file_size;i++)
@@ -183,7 +227,6 @@ void receiveControl(int fd, int startOrEnd)
   }
   i++;
   int sizeOcteto=0;
-  printf("%d\n",message[0]);
   do
   {
     if(message[i]==0)

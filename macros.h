@@ -29,5 +29,6 @@
 #define FALSE 0
 #define TRUE 1
 
+#define clear() printf("\033[H\033[J")
 
 #endif

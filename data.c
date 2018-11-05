@@ -8,6 +8,8 @@ void changestate2WriteREJ(unsigned char message);
 int s = 0;
 int state2 = 0;
 int state3 = 0;
+unsigned char last_tram[10 * PackageSize];
+int ja_last=0;
 
 int count2 = 1;
 int data_alarm = 0;
@@ -22,6 +24,33 @@ void touch2()
     exit(1);
   }
 }
+
+int comparer(unsigned char *n1,int lenght)
+{
+  if(ja_last)
+  {
+    int igual=0;
+    for(int i=0;i<lenght;i++)
+    {
+      if(n1[i]!=last_tram[i])
+      {
+        igual=1;
+      }
+      last_tram[i]=n1[i];
+    }
+    return igual;
+  }
+  else
+  {
+    ja_last=1;
+    for(int i=0;i<lenght;i++)
+    {
+      last_tram[i]=n1[i];
+    }
+    return 1;
+  }
+}
+
 
 void writeStuff(unsigned char data, int fd)
 {
@@ -90,7 +119,6 @@ void sendDataAux(unsigned char *data, int length, int fd)
   writeByte(fd, send);
 
   writeStuff(bcc1, fd);
-  printf("Bcc1:%x\n",bcc1);
 
   for (int i = 0; i < length; i++)
   {
@@ -98,7 +126,6 @@ void sendDataAux(unsigned char *data, int length, int fd)
   }
 
   writeStuff(bcc2, fd);
-  printf("Bcc2:%x\n",bcc2);
   send = FLAG;
   writeByte(fd, send);
 }
@@ -196,7 +223,7 @@ int llRead(int fd, unsigned char *guardar2)
       {
         printf("Error Reading...\n");
         state2 = 0;
-        printf("Sending REJ message to Sender...\n");
+        printf("Sending REJ message to Sender, Flag error...\n");
         if (s == 0)
           sendMessage("REJ0", "R", fd);
         else
@@ -221,7 +248,10 @@ int llRead(int fd, unsigned char *guardar2)
       }
       changestate2Read(guardar[0], bcc);
       changestate2Read(guardar[1], bcc);
-      printf("BCC1:%x\n",bcc);
+      if (unStuff(guardar[2], guardar[3]) == 0)
+        changestate2Read(guardar[2], bcc);
+      else
+        changestate2Read(unStuff(guardar[2], guardar[3]), bcc);
       bcc = 0;
       for (; j <= i; j++, k++)
       {
@@ -246,11 +276,20 @@ int llRead(int fd, unsigned char *guardar2)
           guardar2[k] = guardar[j];
         }
       }
-      printf("BCC2:%x\n",bcc);
-      if (unStuff(guardar[2], guardar[3]) == 0)
-        changestate2Read(guardar[2], bcc);
-      else
-        changestate2Read(unStuff(guardar[2], guardar[3]), bcc);
+
+
+      if(comparer(guardar2,k)==0)
+      {
+        printf("Repeated message. Sending RR...\n");
+        if (s == 0)
+          sendMessage("RR0", "R", fd);
+        else
+          sendMessage("RR1", "R", fd);
+        printf("RR message sent. \n");
+        continue;
+      }
+
+
       if (unStuff(guardar[i + help], guardar[i + 1 + help]) == 0)
         changestate2Read(guardar[i + 1 + help], bcc);
       else
@@ -258,7 +297,7 @@ int llRead(int fd, unsigned char *guardar2)
       changestate2Read(guardar[i + 2 + help], bcc);
       if (state2 != 6)
       {
-        printf("Sending REJ message to Sender...\n");
+        printf("Sending REJ message to Sender. Message wrong...\n");
         if (s == 0)
           sendMessage("REJ0", "R", fd);
         else
