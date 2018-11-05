@@ -68,7 +68,7 @@ void applicationSend(int fd, char* path){
       fileText+=sizeof(char);
     }
     sendData(text,fd,j,sizeof(char)*PackageSize);
-    int percent=i*100/PackageSize;
+    int percent=i*100/size;
     clear();
     printf("+----------------------------------------------------------------------------------------------------+\n|");
     for(int progresso=0;progresso<100;progresso++)
@@ -83,7 +83,7 @@ void applicationSend(int fd, char* path){
     printf("|\n");
     printf("+----------------------------------------------------------------------------------------------------+\n");
     printf("Progress: %d%%\n",percent);
-    printf("Progress: %llu/%d\n",i,file_size);
+    printf("Progress: %llu/%d\n",i,size);
 
   }
   i+=PackageSize;
