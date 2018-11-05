@@ -27,6 +27,7 @@ void makeConnectionReceiver(int fd)
     printf("Waiting for the SET message from Sender...\n");
     while(getStateSet()!=5){
       res=read(fd,&receive,1);
+      printf("aqui\n");
       if(res==0)continue;
       stateMachineSET(receive);
     }
@@ -92,7 +93,7 @@ int llOpen( char *canal)
   /* set input mode (non-canonical, no echo,...) */
   (*newtio).c_lflag = 0;
 
-  (*newtio).c_cc[VTIME]    = 8;
+  (*newtio).c_cc[VTIME]    = 0;
   (*newtio).c_cc[VMIN]     = 1;
   tcflush(fd, TCIOFLUSH);
 

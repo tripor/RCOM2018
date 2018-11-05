@@ -30,6 +30,7 @@ void disconnectSender(int fd)
     //Receber a mensagem de disconnect do Receiver
     alarm(WAITTIME);
     while(getStateDisc()!=5){
+        signal(SIGALRM, touchDisconnect);
         unsigned char receive;
         res=read(fd,&receive,1);
         if(disconnect_alarm)
@@ -72,6 +73,7 @@ void disconnectReceiver(int fd)
     signal(SIGALRM, touchDisconnect);
     alarm(WAITTIME);
     while(getStateDisc()!=5){
+        signal(SIGALRM, touchDisconnect);
         res=read(fd,&receive,1);
         if(disconnect_alarm)
         {

@@ -90,6 +90,7 @@ void sendDataAux(unsigned char *data, int length, int fd)
   writeByte(fd, send);
 
   writeStuff(bcc1, fd);
+  printf("Bcc1:%x\n",bbc1);
 
   for (int i = 0; i < length; i++)
   {
@@ -97,6 +98,7 @@ void sendDataAux(unsigned char *data, int length, int fd)
   }
 
   writeStuff(bcc2, fd);
+  printf("Bcc2:%x\n",bbc2);
   send = FLAG;
   writeByte(fd, send);
 }
@@ -114,6 +116,7 @@ int llwrite(int fd, unsigned char *data, int length)
   alarm(WAITTIME);
   while (state2 != 5)
   {
+    signal(SIGALRM, touch2);
     res = read(fd, &receive, 1);
     if (data_alarm)
     {
@@ -218,6 +221,7 @@ int llRead(int fd, unsigned char *guardar2)
       }
       changestate2Read(guardar[0], bcc);
       changestate2Read(guardar[1], bcc);
+      printf("BCC1:%x\n",bcc);
       bcc = 0;
       for (; j <= i; j++, k++)
       {
@@ -242,6 +246,7 @@ int llRead(int fd, unsigned char *guardar2)
           guardar2[k] = guardar[j];
         }
       }
+      printf("BCC2:%x\n",bcc);
       if (unStuff(guardar[2], guardar[3]) == 0)
         changestate2Read(guardar[2], bcc);
       else
