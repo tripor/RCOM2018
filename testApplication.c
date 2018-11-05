@@ -71,7 +71,7 @@ void applicationSend(int fd, char* path){
     int percent=i*100/size;
     clear();
     printf("+----------------------------------------------------------------------------------------------------+\n|");
-    for(int progresso=0;progresso<100;progresso++)
+    for(int progresso=1;progresso<=100;progresso++)
     {
       if(progresso<=percent)
       {
@@ -94,7 +94,7 @@ void applicationSend(int fd, char* path){
   }
   clear();
   printf("+----------------------------------------------------------------------------------------------------+\n|");
-  for(int progresso=0;progresso<100;progresso++)
+  for(int progresso=1;progresso<=100;progresso++)
   {
       printf("#");
   }
