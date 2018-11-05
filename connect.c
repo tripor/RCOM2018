@@ -53,6 +53,7 @@ void makeConnectionSender(int fd)
         res=read(fd,&receive,1);
         if(connect_alarm)
         {
+            signal(SIGALRM, touchConnectSender);
             sendMessage("SET","W",fd);
             connect_alarm=0;
             resetStates();
