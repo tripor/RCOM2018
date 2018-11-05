@@ -189,7 +189,7 @@ void receiveDataRead(int fd)
     int percent=total*100/file_size;
     clear();
     printf("+----------------------------------------------------------------------------------------------------+\n|");
-    for(int progresso=0;progresso<100;progresso++)
+    for(int progresso=1;progresso<=100;progresso++)
     {
       if(progresso<=percent)
       {
