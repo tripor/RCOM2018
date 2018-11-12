@@ -10,7 +10,7 @@ int state2 = 0;
 int state3 = 0;
 unsigned char last_tram[10 * PackageSize];
 int ja_last=0;
-
+int error=0;
 int count2 = 1;
 int data_alarm = 0;
 /**
@@ -20,11 +20,11 @@ int data_alarm = 0;
 void touch2()
 {
   data_alarm = 1;
-  //printf("Timeout number %d in Data message response. Resending data...\n", count2);
+  printf("Timeout number %d in Data message response. Resending data...\n", count2);
   count2++;
   if (count2 >= 4)
   {
-    //printf("Couldn't send data. Exiting...\n");
+    printf("Couldn't send data. Exiting...\n");
     exit(1);
   }
 }
@@ -131,6 +131,18 @@ void sendDataAux(unsigned char *data, int length, int fd)
     bcc2 ^= data[i];
   }
 
+  if(error >=100)
+  {
+    printf("aqui");
+    error-=100;
+    bcc1=0;
+    bcc2=0;
+  }
+  else
+  {
+    error+=PerError;
+  }
+
   send = FLAG;
   writeByte(fd, send);
   send = Aemi;
@@ -173,7 +185,7 @@ int llwrite(int fd, unsigned char *data, int length)
   state3 = 0;
   sendDataAux(data, length, fd);
   signal(SIGALRM, touch2);
-  //printf("Data sent. Waiting for the response...\n");
+  printf("Data sent. Waiting for the response...\n");
   alarm(WAITTIME);
   while (state2 != 5)
   {
@@ -195,10 +207,10 @@ int llwrite(int fd, unsigned char *data, int length)
     changestate2WriteREJ(receive);
     if (state3 == 5)
     {
-      //printf("REJ message received ...\n");
-      //printf("Resending data...\n");
+      printf("REJ message received ...\n");
+      printf("Resending data...\n");
       sendDataAux(data, length, fd);
-      //printf("Data resent.\n");
+      printf("Data resent.\n");
       state2 = 0;
       state3 = 0;
       count2 = 1;
@@ -207,7 +219,7 @@ int llwrite(int fd, unsigned char *data, int length)
     }
   }
   alarm(0);
-  //printf("Response received.\n");
+  printf("Response received.\n");
   count2 = 1;
   if (s == 0)
     s = 1;
@@ -231,7 +243,7 @@ int llRead(int fd, unsigned char *guardar2)
   int res;
   int passei = 0;
   int k = 0;
-  //printf("Reading data...\n");
+  printf("Reading data...\n");
   while (state2 != 6)
   {
     bcc = 0;
@@ -264,14 +276,14 @@ int llRead(int fd, unsigned char *guardar2)
       // Caso a trama tenho um tamanho muito pequeno, vai ser descartada
       if (i < 4)
       {
-        //printf("Error Reading...\n");
+        printf("Error Reading...\n");
         state2 = 0;
-        //printf("Sending REJ message to Sender, Flag error...\n");
+        printf("Sending REJ message to Sender, Flag error...\n");
         if (s == 0)
           sendMessage("REJ0", "R", fd);
         else
           sendMessage("REJ1", "R", fd);
-        //printf("REJ message sent. S: %d\n", s);
+        printf("REJ message sent. S: %d\n", s);
         continue;
       }
       // Caso a trama tenha um tamanho demasiado grande
@@ -326,12 +338,12 @@ int llRead(int fd, unsigned char *guardar2)
       // Verificar se a trama recebida não é repetida
       if(comparer(guardar2,k)==0)
       {
-        //printf("Repeated message. Sending RR...\n");
+        printf("Repeated message. Sending RR...\n");
         if (s == 0)
           sendMessage("RR0", "R", fd);
         else
           sendMessage("RR1", "R", fd);
-        //printf("RR message sent. \n");
+        printf("RR message sent. \n");
         continue;
       }
 
@@ -344,12 +356,12 @@ int llRead(int fd, unsigned char *guardar2)
       // Caso a mensagem recebida esteja errada
       if (state2 != 6)
       {
-        //printf("Sending REJ message to Sender. Message wrong...\n");
+        printf("Sending REJ message to Sender. Message wrong...\n");
         if (s == 0)
           sendMessage("REJ0", "R", fd);
         else
           sendMessage("REJ1", "R", fd);
-        //printf("REJ message sent. S:%d\n", s);
+        printf("REJ message sent. S:%d\n", s);
         state2 = 0;
       }
     }
@@ -359,12 +371,12 @@ int llRead(int fd, unsigned char *guardar2)
   else
     s = 1;
   // Caso a mensagem recebida esteja correta
-  //printf("Data read. Sending RR message to Sender...\n");
+  printf("Data read. Sending RR message to Sender...\n");
   if (s == 0)
     sendMessage("RR0", "R", fd);
   else
     sendMessage("RR1", "R", fd);
-  //printf("RR message sent. \n");
+  printf("RR message sent. \n");
   return k;
 }
 /**

@@ -12,11 +12,11 @@ int connect_alarm=0;
 void touchConnectSender()
 {
     connect_alarm=1;
-    //printf("Timeout number %d in SET message response. Resending message...\n", connect_count);
+    printf("Timeout number %d in SET message response. Resending message...\n", connect_count);
     connect_count++;
     if(connect_count>=4)
     {
-        //printf("Couldn't make connection. Exiting...\n");
+        printf("Couldn't make connection. Exiting...\n");
         exit(1);
     }
 }
@@ -32,16 +32,16 @@ void makeConnectionReceiver(int fd)
     connect_fd=fd;
     connect_count=0;
     //esperar pela mensagem de set do emissor
-    //printf("Waiting for the SET message from Sender...\n");
+    printf("Waiting for the SET message from Sender...\n");
     while(getStateSet()!=5){
       res=read(fd,&receive,1);
       if(res==0)continue;
       stateMachineSET(receive);
     }
     //Mandar a mensagem de UA
-    //printf("SET message received. Sending UA message to Receiver...\n");
+    printf("SET message received. Sending UA message to Receiver...\n");
     sendMessage("UA","R",fd);
-    //printf("UA message sent to Receiver.\n");
+    printf("UA message sent to Receiver.\n");
 }
 /**
  * @brief Estabelece a conecao. deve ser feita por parte do Emissor
@@ -56,9 +56,9 @@ void makeConnectionSender(int fd)
     connect_fd=fd;
     connect_count=0;
     //Mandar mensagem de SET
-    //printf("Sending SET message to Receiver...\n");
+    printf("Sending SET message to Receiver...\n");
     sendMessage("SET","W",fd);
-    //printf("SET message sent to Receiver. Waiting for response...\n");
+    printf("SET message sent to Receiver. Waiting for response...\n");
     //Esperar pela resposta do recetor
     alarm(WAITTIME);
     while(getStateUa()!=5){
@@ -77,7 +77,7 @@ void makeConnectionSender(int fd)
     }
     connect_alarm=0;
     alarm(0);
-    //printf("UA message received from Receiver.\n");
+    printf("UA message received from Receiver.\n");
 
 }
 /**
@@ -118,7 +118,7 @@ int llOpen( char *canal)
     exit(-1);
   }
 
-  //printf("New termios structure set\n");
+  printf("New termios structure set\n");
 
   if(getType())
   {

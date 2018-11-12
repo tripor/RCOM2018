@@ -15,15 +15,20 @@ int main(int argc, char** argv)
   }
   setWrite();
   int fd=llOpen(argv[1]);
+  struct timeval tv;
 
-  clock_t begin = clock();
+
+  gettimeofday(&tv,NULL);
+  long long int begin=tv.tv_usec;
+  long long int segBegin=tv.tv_sec * 1000000 + begin;
 
   applicationSend(fd,argv[2]);
-
-  clock_t end = clock();
-  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("time: %lf seconds\n",time_spent);
-
+ 
+  gettimeofday(&tv,NULL);
+  long long int end=tv.tv_usec;
+  long long int segEnd=tv.tv_sec * 1000000 + end;
+ 
+    printf("Time elpased is %lf \n",(segEnd-segBegin)/1000000.0);
 
   printf("Disconnecting...\n");
   
@@ -31,3 +36,4 @@ int main(int argc, char** argv)
 
   return 0;
 }
+

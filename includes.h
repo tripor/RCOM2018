@@ -10,4 +10,5 @@
 #include <signal.h>
 #include <libgen.h>
 #include <time.h>
+#include <sys/time.h>
 #include "macros.h"

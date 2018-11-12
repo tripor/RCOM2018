@@ -47,7 +47,7 @@ void applicationSend(int fd, char* path){
   char *filename = basename(path);
 
   sendControl(fd, size, filename, StartC); //start
-  //printf("Control Tram start sent.\n");
+  printf("Control Tram start sent.\n");
 
   unsigned char *fileText = calloc(size,sizeof(unsigned char));
   int ch;
@@ -70,23 +70,20 @@ void applicationSend(int fd, char* path){
     sendData(text,fd,j,sizeof(char)*PackageSize);
     int percent=i*100/size;
     clear();
-    //printf("+----------------------------------------------------------------------------------------------------+\n|");
+    printf("+----------------------------------------------------------------------------------------------------+\n|");
     for(int progresso=1;progresso<=100;progresso++)
     {
       if(progresso<=percent)
       {
-        //printf("#");
+        printf("#");
       }
       else
-      {
-
-      }
-        //printf(" ");
+        printf(" ");
     }
-    //printf("|\n");
-    //printf("+----------------------------------------------------------------------------------------------------+\n");
-    //printf("Progress: %d%%\n",percent);
-    //printf("Progress: %llu/%d\n",i,size);
+    printf("|\n");
+    printf("+----------------------------------------------------------------------------------------------------+\n");
+    printf("Progress: %d%%\n",percent);
+    printf("Progress: %llu/%d\n",i,size);
 
   }
   i+=PackageSize;
@@ -96,19 +93,19 @@ void applicationSend(int fd, char* path){
     fileText+=sizeof(char);
   }
   clear();
-  //printf("+----------------------------------------------------------------------------------------------------+\n|");
+  printf("+----------------------------------------------------------------------------------------------------+\n|");
   for(int progresso=1;progresso<=100;progresso++)
   {
-      //printf("#");
+      printf("#");
   }
-  //printf("|\n");
-  //printf("+----------------------------------------------------------------------------------------------------+\n");
-  //printf("Progress: 100%%\n");
-  //printf("Progress: %d/%d\n",size,size);
+  printf("|\n");
+  printf("+----------------------------------------------------------------------------------------------------+\n");
+  printf("Progress: 100%%\n");
+  printf("Progress: %d/%d\n",size,size);
   sendData(text,fd,j,size-(i-sizeof(char)*PackageSize));
-  //printf("All data sent.\n");
+  printf("All data sent.\n");
   sendControl(fd, size, filename, EndC);
-  //printf("Control Tram end sent.\n");
+  printf("Control Tram end sent.\n");
 
   fclose(file);
 
@@ -164,7 +161,7 @@ void sendControl(int fd, int size, char* filename, int startOrEnd){
       ctrl_Tram[i]=filename[k];
     }
 
-    //printf("Sending Control.\n");
+    printf("Sending Control.\n");
     llwrite(fd,ctrl_Tram, pacoteSize);
     return;
 
@@ -191,23 +188,20 @@ void receiveDataRead(int fd)
     }
     int percent=total*100/file_size;
     clear();
-    //printf("+----------------------------------------------------------------------------------------------------+\n|");
+    printf("+----------------------------------------------------------------------------------------------------+\n|");
     for(int progresso=1;progresso<=100;progresso++)
     {
       if(progresso<=percent)
       {
-        //printf("#");
+        printf("#");
       }
       else
-      {
-        
-      }
-        //printf(" ");
+        printf(" ");
     }
-    //printf("|\n");
-    //printf("+----------------------------------------------------------------------------------------------------+\n");
-    //printf("Progress: %d%%\n",percent);
-    //printf("Progress: %llu/%d\n",total,file_size);
+    printf("|\n");
+    printf("+----------------------------------------------------------------------------------------------------+\n");
+    printf("Progress: %d%%\n",percent);
+    printf("Progress: %llu/%d\n",total,file_size);
 
 
   }
@@ -262,16 +256,16 @@ void receiveControl(int fd, int startOrEnd)
       sscanf(takeOff,"%s",my_filename);
     }
   }while(message[i]!=0);
-  //printf("Filename: %s Size: %d \n",my_filename,file_size);
+  printf("Filename: %s Size: %d \n",my_filename,file_size);
 }
 
 void receiveData(int fd){
 
   receiveControl(fd,StartC);
-  //printf("Received control tram start.\n");
+  printf("Received control tram start.\n");
   receiveDataRead(fd);
-  //printf("All data received.\n");
+  printf("All data received.\n");
   receiveControl(fd,EndC);
-  //printf("Received control tram end.\n");
+  printf("Received control tram end.\n");
   return;
 }
