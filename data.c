@@ -136,7 +136,6 @@ void sendDataAux(unsigned char *data, int length, int fd)
     printf("aqui");
     error-=100;
     bcc1=0;
-    bcc2=0;
   }
   else
   {
@@ -191,6 +190,7 @@ int llwrite(int fd, unsigned char *data, int length)
   {
     signal(SIGALRM, touch2);
     res = read(fd, &receive, 1);
+    printf("S:%d %d\n",s,state3);
     if (data_alarm)
     {
       data_alarm = 0;
@@ -335,17 +335,7 @@ int llRead(int fd, unsigned char *guardar2)
         }
       }
 
-      // Verificar se a trama recebida não é repetida
-      if(comparer(guardar2,k)==0)
-      {
-        printf("Repeated message. Sending RR...\n");
-        if (s == 0)
-          sendMessage("RR0", "R", fd);
-        else
-          sendMessage("RR1", "R", fd);
-        printf("RR message sent. \n");
-        continue;
-      }
+      
 
       // Unstuff aos bytes finais
       if (unStuff(guardar[i + help], guardar[i + 1 + help]) == 0)
@@ -363,6 +353,17 @@ int llRead(int fd, unsigned char *guardar2)
           sendMessage("REJ1", "R", fd);
         printf("REJ message sent. S:%d\n", s);
         state2 = 0;
+      }
+      // Verificar se a trama recebida não é repetida
+      if(comparer(guardar2,k)==0)
+      {
+        printf("Repeated message. Sending RR...\n");
+        if (s == 0)
+          sendMessage("RR0", "R", fd);
+        else
+          sendMessage("RR1", "R", fd);
+        printf("RR message sent. \n");
+        continue;
       }
     }
   }
