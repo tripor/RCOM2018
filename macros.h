@@ -90,7 +90,7 @@
 #define StartC  0x02
 #define EndC  0x03
 #define PackageSize 128
-#define PerError 10
+#define PerError 80
 
 #define BAUDRATE B57600
 #define _POSIX_SOURCE 1 /* POSIX compliant source */

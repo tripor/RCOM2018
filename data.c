@@ -133,9 +133,9 @@ void sendDataAux(unsigned char *data, int length, int fd)
 
   if(error >=100)
   {
-    printf("aqui");
-    error-=100;
-    bcc1=0;
+    error=error -100 +PerError;
+    bcc1+=1;
+    bcc2+=1;
   }
   else
   {
@@ -190,7 +190,6 @@ int llwrite(int fd, unsigned char *data, int length)
   {
     signal(SIGALRM, touch2);
     res = read(fd, &receive, 1);
-    printf("S:%d %d\n",s,state3);
     if (data_alarm)
     {
       data_alarm = 0;
