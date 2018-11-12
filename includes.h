@@ -9,4 +9,5 @@
 #include <unistd.h>
 #include <signal.h>
 #include <libgen.h>
+#include <time.h>
 #include "macros.h"

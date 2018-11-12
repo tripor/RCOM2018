@@ -16,11 +16,13 @@ int main(int argc, char** argv)
   setWrite();
   int fd=llOpen(argv[1]);
 
-
+  clock_t begin = clock();
 
   applicationSend(fd,argv[2]);
 
-
+  clock_t end = clock();
+  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("time: %lf seconds\n",time_spent);
 
 
   printf("Disconnecting...\n");
