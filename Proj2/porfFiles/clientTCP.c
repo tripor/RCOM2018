@@ -41,8 +41,8 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 	/*send a string to the server*/
-	bytes = write(sockfd, buf, strlen(buf));
-	printf("Bytes escritos %d\n", bytes);
+	//bytes = write(sockfd, buf, strlen(buf));
+	//printf("Bytes escritos %d\n", bytes);
 
 	close(sockfd);
 	exit(0);

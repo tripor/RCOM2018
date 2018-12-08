@@ -32,6 +32,18 @@ int decomposeURL(char* url,Info* information)
         exit(1);
     }
     information->port=DEFAULT_PORT;
+    char *copy=malloc(strlen(information->url));
+    char last[255];
+    strcpy(copy,information->url);
+
+    text = strtok(copy,"/");
+    while(text != NULL)
+    {
+        strcpy(last,text);
+        text=strtok(NULL,"/");
+    }
+    strcpy(information->filename,last);
+    free(copy);
 
 
     

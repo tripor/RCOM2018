@@ -11,6 +11,7 @@
 #include <strings.h>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
 
 typedef struct Info {
     int port;
@@ -20,4 +21,5 @@ typedef struct Info {
     char url[255];
     char host_name[255];
     char ip[16];
+    char filename[255];
 }Info;
