@@ -1,5 +1,5 @@
 #include "includes.h"
-#include "aux.h"
+#include "auxiliar.h"
 #include "tcp.h"
 
 int main(int argc, char **argv)
