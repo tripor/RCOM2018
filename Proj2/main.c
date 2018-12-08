@@ -22,7 +22,11 @@ int main(int argc, char **argv)
     printf("Host-name: %s\n",information.host_name);
     printf("IP: %s\n",information.ip);
 
-    makeConnection(information.ip,information.port);
-
+    int fd = makeConnection(information.ip,information.port);
+    if(makeLogIn(fd,information.user,information.pass)!=0)
+    {
+        printf("Error making log in.\n");
+        exit(2);
+    }
     return 0;
 }
