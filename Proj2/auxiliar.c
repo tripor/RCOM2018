@@ -5,18 +5,28 @@
 int decomposeURL(char* url,Info* information)
 {
     char *text;
+    int tamanho=strlen(url);
     text = strtok(url,"//");
     if(strcmp(text,"ftp:") !=0)
     {
         printf("Paramatro dados incorreto( ftp:// ). Formato: ./run ftp://[<user>:<password>@]<host>/<url-path>\n");
         exit(1);
     }
+    tamanho -=6;
     text = strtok(NULL,":");
-    text ++;
-    strcpy(information->user,text);
-    text = strtok(NULL,"@");
-    strcpy(information->pass,text);
-    text = strtok(NULL,"/");
+    text++;
+    if(tamanho == strlen(text)){
+      strcpy(information->user,"anonymous");
+      strcpy(information->pass,"1");
+      text = strtok(text,"/");
+    }
+    else
+    {
+       strcpy(information->user,text);
+       text = strtok(NULL,"@");
+       strcpy(information->pass,text);
+      text = strtok(NULL,"/");
+    }
     strcpy(information->host,text);
     text = strtok(NULL," ");
     strcpy(information->url,text);
