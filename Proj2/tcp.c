@@ -29,7 +29,7 @@ int makeConnection(char* ip,int port)
     
     if(port==21)
     {
-        sleep(1);
+        usleep(100000);
         char buf[1000];
         int len = read(sockfd, &buf, 1000);
         buf[len] = '\0';
@@ -49,7 +49,7 @@ int writeMessage(int fd,char* message)
 
 int readMessage(int fd,char* message)
 {
-    sleep(1);
+    usleep(100000);
     int res = read(fd,message,255);
     message[res]='\0';
     return res;

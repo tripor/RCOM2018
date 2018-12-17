@@ -5,21 +5,16 @@
 int decomposeURL(char* url,Info* information)
 {
     char *text;
-    text = strtok(url,"[");
-    if(strcmp(text,"ftp://") !=0)
+    text = strtok(url,"//");
+    if(strcmp(text,"ftp:") !=0)
     {
         printf("Paramatro dados incorreto( ftp:// ). Formato: ./run ftp://[<user>:<password>@]<host>/<url-path>\n");
         exit(1);
     }
     text = strtok(NULL,":");
+    text ++;
     strcpy(information->user,text);
-    text = strtok(NULL,"]");
-    if(text[strlen(text)-1] != '@')
-    {
-        printf("Paramatro dados incorreto( @] ). Formato: ./run ftp://[<user>:<password>@]<host>/<url-path>\n");
-        exit(1);
-    }
-    text[strlen(text)-1] = '\0';
+    text = strtok(NULL,"@");
     strcpy(information->pass,text);
     text = strtok(NULL,"/");
     strcpy(information->host,text);
