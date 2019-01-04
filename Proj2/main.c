@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 {
     if(argc != 2)
     {
-        printf("Numero incorreto de parametro. Formato: ./run ftp://[<user>:<password>@]<host>/<url-path>");
+        printf("Numero incorreto de parametro. Formato: ./download ftp://[<user>:<password>@]<host>/<url-path>");
         exit(1);
     }
 
